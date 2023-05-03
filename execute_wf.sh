@@ -6,4 +6,4 @@ curl \
    http://workflows-argo-workflows-server.argo:2746/api/v1/workflows/argo \
   -H "Authorization: $ARGO_TOKEN" \
   -H 'Content-Type: application/json' \
-  -d \'$ARGO_TOKEN\'
+  -d "$ARGO_TOKEN"
