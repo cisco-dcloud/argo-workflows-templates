@@ -1,0 +1,24 @@
+{
+  "workflow": {
+    "metadata": {
+      "generateName": "container-"
+    },
+    "spec": {
+      "templates": [
+        {
+          "name": "main",
+          "container": {
+            "image": "docker/whalesay",
+            "command": [
+              "cowsay"
+            ],
+            "args": [
+              "hello {{workflow.name}}"
+            ]
+          }
+        }
+      ],
+      "entrypoint": "main"
+    }
+  }
+}
