@@ -9,9 +9,9 @@ spec:
     - name: terraform-docker-image
       value: "hashicorp/terraform:1.4"
     - name: terraform-script-repository
-      value: "https://github.com/cisco-dcloud/eks-argo-sandbox.git"
+      value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
     - name: terraform-script-path
-      value: "terraform_cli/bogus"      
+      value: "terraform_examples/random"      
 
   templates:
     - name: plan
