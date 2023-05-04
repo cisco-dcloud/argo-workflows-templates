@@ -32,12 +32,13 @@ spec:
         source: |
           mkdir /home/current
           cp /home/terraform/{{inputs.parameters.terraform-script-path}}/*.tf /home/current
-          /bin/terraform init -input=false /home/current
-          /bin/terraform plan -parallelism=2 -input=false -no-color -out=/home/current/tfclientsplan /home/current >> /tmp/terraform-change.log
+          cd /home/current
+          /bin/terraform init -input=false
+          /bin/terraform plan -parallelism=2 -input=false -no-color -out=/tmp/tfclientsplan >> /tmp/terraform-change.log
       outputs:
         artifacts:
           - name: terraform-plan
-            path: /home/current/tfclientsplan
+            path: /tmp/tfclientsplan
             archive:
               none: {}
           - name: terraform-log
@@ -54,7 +55,8 @@ spec:
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: |
-          /bin/terraform apply -input=false -parallelism=2 -no-color /home/terraform/tfclientsplan
+          cd /home/terraform
+          /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
 
     - name: approve
       suspend: {}
