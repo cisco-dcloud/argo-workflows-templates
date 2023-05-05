@@ -76,6 +76,12 @@ spec:
           cd /home/current
           whoami
           ls -la
+          chmod 666 tfclientsplan
+          chmod 644 *.tf
+          chmod 644 .terraform.lock.hcl
+          chmod -R 755 .terraform
+          #https://github.com/actions/upload-artifact/issues/38
+          ls -la
           /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
         env:
         - name: AWS_ACCESS_KEY_ID
