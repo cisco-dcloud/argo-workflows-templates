@@ -6,7 +6,9 @@ spec:
   workflowTemplateRef:
     name: terraform
   entrypoint: update-auto-approve
-  # arguments:
-  #   parameters:     
-  #   - name: terraform-secret-name
-  #     value: "tf-sandboxes"
+  arguments:
+    parameters:     
+    - name: terraform-secret-name
+      value: "tf-sandboxes"
+    - name: terraform-script-path
+      value: "terraform_examples/sandbox"
