@@ -3,6 +3,6 @@ kind: Workflow
 metadata:
   generateName: terraform-
 spec:
-  entrypoint: update
+  entrypoint: update-auto-approve
   workflowTemplateRef:
     name: terraform

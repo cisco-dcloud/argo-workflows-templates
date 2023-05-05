@@ -77,3 +77,16 @@ spec:
               artifacts:
               - name: terraform-plan
                 from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
+
+    - name: update-auto-approve
+      dag:
+        tasks:
+          - name: plan
+            template: plan
+          - name: apply
+            template: apply
+            dependencies: [plan]
+            arguments:
+              artifacts:
+              - name: terraform-plan
+                from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
