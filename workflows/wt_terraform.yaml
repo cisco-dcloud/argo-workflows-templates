@@ -39,6 +39,7 @@ spec:
           ls -la
           /bin/terraform init -input=false
           /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan >> /tmp/terraform-change.log
+          ls -la
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
