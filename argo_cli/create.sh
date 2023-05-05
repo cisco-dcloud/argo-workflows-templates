@@ -1,7 +1,8 @@
 
 NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 SERVICEACCOUNT=argo-workflows
-ns_arg="-n $NAMESPACE --serviceaccount $SERVICEACCOUNT"
+ns_arg="-n $NAMESPACE"
+sa_arg="--serviceaccount $SERVICEACCOUNT"
 
 
 # First parameter for this script is the name of the workflow
@@ -19,7 +20,7 @@ argo template delete $1 $ns_arg
 #Create workflow template
 argo template create ../workflows/wt_$1.yaml  $ns_arg
 #Create workflow from workflow template
-ARGO_WF=$(argo submit ../workflows/w_$1.yaml  $ns_arg | grep "Name:" | awk '{print $2}')
+ARGO_WF=$(argo submit ../workflows/w_$1.yaml  $ns_arg  $sa_arg | grep "Name:" | awk '{print $2}')
 #Watch workflow execution
 argo watch $ARGO_WF  $ns_arg
 #Display workflow logs
