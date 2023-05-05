@@ -3,6 +3,9 @@ kind: WorkflowTemplate
 metadata:
   name: terraform
 spec:
+  #Will delete artifacts when the workflow is deleted
+  artifactGC:
+    strategy: OnWorkflowDeletion 
   entrypoint: update
   arguments:
     parameters:
@@ -28,14 +31,13 @@ spec:
         - name: terraform-script-path
           value: "{{workflow.parameters.terraform-script-path}}" 
       script:
-        imagePullPolicy: "Always"
+        imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: |
           mkdir /home/current
           cp /home/terraform/{{inputs.parameters.terraform-script-path}}/* /home/current
           cd /home/current
-          whoami
           ls -la
           /bin/terraform init -input=false
           /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan >> /tmp/terraform-change.log
@@ -62,14 +64,13 @@ spec:
             archive:
               none: {}
 
-
     - name: apply
       inputs:
         artifacts:
         - name: terraform-plan
           path: /home/current
       script:
-        imagePullPolicy: "Always"
+        imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: |
@@ -81,7 +82,7 @@ spec:
           chmod 644 .terraform.lock.hcl
           chmod -R 755 .terraform
           ls -la
-          /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
+          /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan >> /tmp/terraform-change.log
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -93,6 +94,47 @@ spec:
             secretKeyRef:
               name: "{{workflow.parameters.terraform-secret-name}}" 
               key: AWS_SECRET 
+      outputs:
+        artifacts:
+          - name: terraform-state
+            path: /home/current
+            archive:
+              none: {}
+          - name: terraform-change-log-with-key
+            path: /tmp/terraform-change.log
+            s3:
+              key: terraform-change-log-with-key
+
+    - name: destroy
+      inputs:
+        artifacts:
+        - name: terraform-state
+          path: /home/current
+      script:
+        imagePullPolicy: "IfNotPresent"
+        image: "{{workflow.parameters.terraform-docker-image}}"
+        command: ["sh"]
+        source: |
+          cd /home/current
+          ls -la
+          chmod 666 tfclientsplan
+          chmod 644 *.tf
+          chmod 644 .terraform.lock.hcl
+          chmod -R 755 .terraform
+          ls -la
+          /bin/terraform destroy -input=false -parallelism=2 -no-color
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_KEY 
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_SECRET 
+
     - name: approve
       suspend: {}
     - name: update
@@ -122,3 +164,13 @@ spec:
               artifacts:
               - name: terraform-plan
                 from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
+          - name: approve
+            dependencies: [plan,apply]
+            template: approve
+          - name: destroy
+            template: destroy
+            dependencies: [approve]
+            arguments:
+              artifacts:
+              - name: terraform-state
+                from: "{{tasks.apply.outputs.artifacts.terraform-state}}"
