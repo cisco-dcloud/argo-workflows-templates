@@ -3,9 +3,6 @@ kind: WorkflowTemplate
 metadata:
   name: terraform
 spec:
-  #Will delete artifacts when the workflow is deleted
-  artifactGC:
-    strategy: OnWorkflowDeletion 
   entrypoint: update
   arguments:
     parameters:

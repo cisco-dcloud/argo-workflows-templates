@@ -5,6 +5,9 @@ metadata:
 spec:
   workflowTemplateRef:
     name: terraform
+  #Will delete artifacts when the workflow is deleted
+  artifactGC:
+    strategy: OnWorkflowDeletion  #Artifacts can be deleted OnWorkflowCompletion or OnWorkflowDeletion
   entrypoint: update-auto-approve
   arguments:
     parameters:     
