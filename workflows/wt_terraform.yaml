@@ -12,6 +12,8 @@ spec:
       value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
     - name: terraform-script-path
       value: "terraform_examples/random"      
+    - name: terraform-secret-name
+      value: ""  
 
   templates:
     - name: plan
@@ -35,6 +37,17 @@ spec:
           cd /home/current
           /bin/terraform init -input=false
           /bin/terraform plan -parallelism=2 -input=false -no-color -out=/tmp/tfclientsplan >> /tmp/terraform-change.log
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_KEY 
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_SECRET 
       outputs:
         artifacts:
           - name: terraform-plan
@@ -45,6 +58,8 @@ spec:
             path: /tmp/terraform-change.log
             archive:
               none: {}
+
+              
     - name: apply
       inputs:
         artifacts:
@@ -58,10 +73,19 @@ spec:
           cd /home/terraform
           ls -la
           /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
-
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_KEY 
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_SECRET 
     - name: approve
       suspend: {}
-
     - name: update
       dag:
         tasks:
@@ -77,7 +101,6 @@ spec:
               artifacts:
               - name: terraform-plan
                 from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
-
     - name: update-auto-approve
       dag:
         tasks:

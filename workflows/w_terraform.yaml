@@ -3,6 +3,10 @@ kind: Workflow
 metadata:
   generateName: terraform-
 spec:
-  entrypoint: update-auto-approve
   workflowTemplateRef:
     name: terraform
+  entrypoint: update-auto-approve
+  arguments:
+    parameters:     
+    - name: terraform-secret-name
+      value: "tf-sandboxes"
