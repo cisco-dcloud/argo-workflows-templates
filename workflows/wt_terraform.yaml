@@ -35,6 +35,8 @@ spec:
           mkdir /home/current
           cp /home/terraform/{{inputs.parameters.terraform-script-path}}/* /home/current
           cd /home/current
+          whoami
+          ls -la
           /bin/terraform init -input=false
           /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan >> /tmp/terraform-change.log
         env:
@@ -71,6 +73,7 @@ spec:
         command: ["sh"]
         source: |
           cd /home/current
+          whoami
           ls -la
           /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
         env:
