@@ -119,7 +119,7 @@ spec:
           chmod 644 .terraform.lock.hcl
           chmod -R 755 .terraform
           ls -la
-          /bin/terraform destroy -input=false -parallelism=2 -no-color
+          /bin/terraform destroy -auto-approve -input=false -parallelism=2 -no-color
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
