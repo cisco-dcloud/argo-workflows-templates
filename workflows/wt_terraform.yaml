@@ -56,6 +56,7 @@ spec:
         command: ["sh"]
         source: |
           cd /home/terraform
+          ls -la
           /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
 
     - name: approve
