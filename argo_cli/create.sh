@@ -1,6 +1,7 @@
 
 NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
-ns_arg="-n $NAMESPACE"
+SERVICEACCOUNT=argo-workflows
+ns_arg="-n $NAMESPACE --serviceaccount $SERVICEACCOUNT"
 
 
 # First parameter for this script is the name of the workflow
