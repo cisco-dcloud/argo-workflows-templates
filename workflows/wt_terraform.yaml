@@ -33,10 +33,10 @@ spec:
         command: ["sh"]
         source: |
           mkdir /home/current
-          cp /home/terraform/{{inputs.parameters.terraform-script-path}}/*.tf /home/current
+          cp /home/terraform/{{inputs.parameters.terraform-script-path}}/* /home/current
           cd /home/current
           /bin/terraform init -input=false
-          /bin/terraform plan -parallelism=2 -input=false -no-color -out=/tmp/tfclientsplan >> /tmp/terraform-change.log
+          /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan >> /tmp/terraform-change.log
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -51,7 +51,7 @@ spec:
       outputs:
         artifacts:
           - name: terraform-plan
-            path: /tmp/tfclientsplan
+            path: /home/current
             archive:
               none: {}
           - name: terraform-log
@@ -64,15 +64,14 @@ spec:
       inputs:
         artifacts:
         - name: terraform-plan
-          path: /home/terraform/tfclientsplan
+          path: /home/current
       script:
         imagePullPolicy: "Always"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: |
-          cd /home/terraform
+          cd /home/current
           ls -la
-          env
           /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
         env:
         - name: AWS_ACCESS_KEY_ID
