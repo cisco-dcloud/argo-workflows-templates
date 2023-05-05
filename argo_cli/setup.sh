@@ -2,7 +2,7 @@ export CLUSTER_SERVER="https://kubernetes.default"
 export CLUSTER_CA="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 export USER_TOKEN_VALUE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 export K8S_NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
-export KUBECONFIG=/config/kubeconfig
+
 
 kubectl config set-cluster cfc --server=$CLUSTER_SERVER --certificate-authority=$CLUSTER_CA
 kubectl config set-context cfc --cluster=cfc
@@ -13,7 +13,8 @@ kubectl config use-context cfc
 export SA_NAME=wc-sshserver
 export CURRENT_CONTEXT=$(kubectl config current-context)
 
-cat << EOF > $KUBECONFIG
+
+cat << EOF > /config/kubeconfig
 apiVersion: v1
 kind: Config
 current-context: ${CURRENT_CONTEXT}
@@ -39,3 +40,4 @@ export ARGO_HTTP1=true
 export ARGO_SECURE=false
 export ARGO_BASE_HREF=
 export ARGO_NAMESPACE=$K8S_NAMESPACE
+export KUBECONFIG=/config/kubeconfig
