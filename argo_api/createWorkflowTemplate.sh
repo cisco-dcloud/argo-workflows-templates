@@ -52,9 +52,9 @@ curl -vvv \
    http://workflows-argo-workflows-server.argo:2746/api/v1/workflow-templates/$NAMESPACE \
   -H "Authorization: $ARGO_TOKEN" \
   -H "Content-Type: application/json" \
-  -d "'"$PAYLOAD_JSON"'"
+  -d '$PAYLOAD_JSON'
 EOF
 
 echo $CMD
 
-CMD
+$CMD
