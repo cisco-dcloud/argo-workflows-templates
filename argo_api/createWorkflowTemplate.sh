@@ -37,7 +37,7 @@ SERVICEACCOUNT=argo-workflows
 
 PAYLOAD_JSON=$(yq -o=json '.' ../workflows/wt_$1.yaml)
 
-$PAYLOAD_JSON << EOF
+read -r -d '' PAYLOAD_JSON  << EOF
 {
   "namespace": "$NAMESPACE",
   "template": "$PAYLOAD_JSON"
@@ -47,7 +47,7 @@ EOF
 echo $PAYLOAD_JSON
 
 
-$CMD << EOF
+read -r -d '' CMD  << EOF
 curl -vvv \
    http://workflows-argo-workflows-server.argo:2746/api/v1/workflow-templates/$NAMESPACE \
   -H "Authorization: $ARGO_TOKEN" \
