@@ -47,8 +47,20 @@ PAYLOAD << EOF
 }
 EOF
 
+read -r -d '' CMD  << EOF
 curl -vvv \
   -H "Authorization: $ARGO_TOKEN" \
   -H "Content-Type: application/json" \
   "http://workflows-argo-workflows-server.argo:2746/api/v1/workflows/$NAMESPACE/submit" \
   -d $PAYLOAD
+EOF
+
+TOPRINT=${CMD/$ARGO_TOKEN/token...}
+echo "CURL command is:"
+echo "-------------------------------------"
+echo
+echo $TOPRINT
+echo
+echo "-------------------------------------"
+echo
+eval $CMD

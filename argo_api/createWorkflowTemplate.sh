@@ -23,10 +23,11 @@ curl -vvv \
   -d '$PAYLOAD_JSON'
 EOF
 
+TOPRINT=${CMD/$ARGO_TOKEN/token...}
 echo "CURL command is:"
 echo "-------------------------------------"
 echo
-echo $CMD
+echo $TOPRINT
 echo
 echo "-------------------------------------"
 echo

@@ -14,10 +14,11 @@ curl -vvv -X DELETE \
   "http://workflows-argo-workflows-server.argo:2746/api/v1/workflow-templates/$NAMESPACE/$TEMPLATENAME"
 EOF
 
+TOPRINT=${CMD/$ARGO_TOKEN/token...}
 echo "CURL command is:"
 echo "-------------------------------------"
 echo
-echo $CMD
+echo $TOPRINT
 echo
 echo "-------------------------------------"
 echo
