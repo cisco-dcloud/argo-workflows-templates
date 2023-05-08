@@ -51,7 +51,3 @@ curl -vvv \
   -H "Content-Type: application/json" \
   -d "$PAYLOAD_JSON"
 
-{ "apiVersion": "argoproj.io/v1alpha1", "kind": "WorkflowTemplate", "metadata": { "name": "whalesay" }, "spec": { "entrypoint": "main", "templates": [ { "name": "main", "container": { "image": "docker/whalesay", "command": [ "cowsay" ], "args": [ "hello {{workflow.name}}" ] } } ] } }
-
-
-
