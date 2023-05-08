@@ -35,7 +35,7 @@ SERVICEACCOUNT=argo-workflows
 #   }
 # }
 
-PAYLOAD << EOF
+read -r -d '' PAYLOAD  << EOF
 {
   "namespace": "$NAMESPACE",
   "resourceKind": "WorkflowTemplate",
