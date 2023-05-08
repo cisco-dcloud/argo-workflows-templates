@@ -35,12 +35,12 @@ SERVICEACCOUNT=argo-workflows
 #   }
 # }
 
-PAYLOAD_JSON=$(yq -o=json '.' ../workflows/wt_$1.yaml | tr -d '"')
+PAYLOAD_JSON=$(yq -o=json '.' ../workflows/wt_$1.yaml)
 
 read -r -d '' PAYLOAD_JSON  << EOF
 {
   "namespace": "$NAMESPACE",
-  "template": "$PAYLOAD_JSON"
+  "template": $PAYLOAD_JSON
 }
 EOF
 
