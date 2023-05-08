@@ -48,7 +48,7 @@ PAYLOAD << EOF
 EOF
 
 curl -vvv \
-   http://workflows-argo-workflows-server.argo:2746/api/v1/workflows/$NAMESPACE/submit \
   -H "Authorization: $ARGO_TOKEN" \
   -H "Content-Type: application/json" \
+  "http://workflows-argo-workflows-server.argo:2746/api/v1/workflows/$NAMESPACE/submit" \
   -d $PAYLOAD

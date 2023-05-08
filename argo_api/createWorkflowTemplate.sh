@@ -30,4 +30,4 @@ echo $CMD
 echo
 echo "-------------------------------------"
 echo
-$CMD
+eval $CMD
