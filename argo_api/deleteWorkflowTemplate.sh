@@ -11,7 +11,7 @@ read -r -d '' CMD  << EOF
 curl -vvv -X DELETE \
   -H "Authorization: $ARGO_TOKEN" \
   -H "Content-Type: application/json" \
-  "http://workflows-argo-workflows-server.argo:2746/api/v1/workflow-templates/$NAMESPACE/$TEMPLATENAME" \
+  "http://workflows-argo-workflows-server.argo:2746/api/v1/workflow-templates/$NAMESPACE/$TEMPLATENAME"
 EOF
 
 echo "CURL command is:"

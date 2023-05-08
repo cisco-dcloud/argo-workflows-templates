@@ -11,7 +11,7 @@ read -r -d '' CMD  << EOF
 curl -vvv -X GET \
   -H "Authorization: $ARGO_TOKEN" \
   -H "Content-Type: application/json" \
-  "http://workflows-argo-workflows-server.argo:2746/api/v1/workflow-templates/$NAMESPACE" \
+  "http://workflows-argo-workflows-server.argo:2746/api/v1/workflow-templates/$NAMESPACE"
 EOF
 
 echo "CURL command is:"
