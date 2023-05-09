@@ -174,8 +174,8 @@ spec:
             dependencies: [plan, approve]
             arguments:
               artifacts:
-              - name: terraform-plan
-                from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
+              - name: terraform-folder
+                from: "{{tasks.plan.outputs.artifacts.terraform-folder}}"
     - name: update-auto-approve
       dag:
         tasks:
