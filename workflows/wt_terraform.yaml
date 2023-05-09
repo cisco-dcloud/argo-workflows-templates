@@ -35,10 +35,8 @@ spec:
           mkdir /home/current
           cp /home/terraform/{{inputs.parameters.terraform-script-path}}/* /home/current
           cd /home/current
-          ls -la
           /bin/terraform init -input=false
           /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan >> /tmp/terraform-change.log
-          ls -la
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -60,7 +58,6 @@ spec:
             path: /tmp/terraform-change.log
             archive:
               none: {}
-
     - name: apply
       inputs:
         artifacts:
@@ -72,13 +69,10 @@ spec:
         command: ["sh"]
         source: |
           cd /home/current
-          whoami
-          ls -la
           chmod 666 tfclientsplan
           chmod 644 *.tf
           chmod 644 .terraform.lock.hcl
           chmod -R 755 .terraform
-          ls -la
           /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan >> /tmp/terraform-change.log
         env:
         - name: AWS_ACCESS_KEY_ID
@@ -101,7 +95,6 @@ spec:
             path: /tmp/terraform-change.log
             s3:
               key: terraform-change-log-with-key
-
     - name: destroy
       inputs:
         artifacts:
@@ -113,12 +106,10 @@ spec:
         command: ["sh"]
         source: |
           cd /home/current
-          ls -la
           chmod 666 tfclientsplan
           chmod 644 *.tf
           chmod 644 .terraform.lock.hcl
           chmod -R 755 .terraform
-          ls -la
           /bin/terraform destroy -auto-approve -input=false -parallelism=2 -no-color
         env:
         - name: AWS_ACCESS_KEY_ID
@@ -131,7 +122,43 @@ spec:
             secretKeyRef:
               name: "{{workflow.parameters.terraform-secret-name}}" 
               key: AWS_SECRET 
-
+    - name: outputs
+      inputs:
+        artifacts:
+        - name: terraform-plan
+          path: /home/current
+      script:
+        imagePullPolicy: "IfNotPresent"
+        image: "{{workflow.parameters.terraform-docker-image}}"
+        command: ["sh"]
+        source: |
+          cd /home/current
+          chmod 666 tfclientsplan
+          chmod 644 *.tf
+          chmod 644 .terraform.lock.hcl
+          chmod -R 755 .terraform
+          /bin/terraform output -json > /tmp/tf_outputs.json
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_KEY 
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_SECRET 
+      outputs:
+        artifacts:
+          - name: terraform-outputs
+            path: /tmp/tf_outputs.json
+            archive:
+              none: {}
+        parameters:
+          - name: terraform-outputs
+            valueFrom: 
+              path: /tmp/tf_outputs.json
     - name: approve
       suspend: {}
     - name: update
@@ -161,6 +188,13 @@ spec:
               artifacts:
               - name: terraform-plan
                 from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
+          - name: outputs
+            template: outputs
+            dependencies: [apply]
+            arguments:
+              artifacts:
+              - name: terraform-state
+                from: "{{tasks.apply.outputs.artifacts.terraform-state}}"
           - name: approve
             dependencies: [plan,apply]
             template: approve
