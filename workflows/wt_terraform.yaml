@@ -50,7 +50,7 @@ spec:
               key: AWS_SECRET 
       outputs:
         artifacts:
-          - name: terraform-plan
+          - name: terraform-folder
             path: /home/current
             archive:
               none: {}
@@ -61,7 +61,7 @@ spec:
     - name: apply
       inputs:
         artifacts:
-        - name: terraform-plan
+        - name: terraform-folder
           path: /home/current
       script:
         imagePullPolicy: "IfNotPresent"
@@ -87,7 +87,7 @@ spec:
               key: AWS_SECRET 
       outputs:
         artifacts:
-          - name: terraform-state
+          - name: terraform-folder
             path: /home/current
             archive:
               none: {}
@@ -98,7 +98,7 @@ spec:
     - name: destroy
       inputs:
         artifacts:
-        - name: terraform-state
+        - name: terraform-folder
           path: /home/current
       script:
         imagePullPolicy: "IfNotPresent"
@@ -125,7 +125,7 @@ spec:
     - name: outputs
       inputs:
         artifacts:
-        - name: terraform-plan
+        - name: terraform-folder
           path: /home/current
       script:
         imagePullPolicy: "IfNotPresent"
@@ -186,15 +186,15 @@ spec:
             dependencies: [plan]
             arguments:
               artifacts:
-              - name: terraform-plan
-                from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
+              - name: terraform-folder
+                from: "{{tasks.plan.outputs.artifacts.terraform-folder}}"
           - name: outputs
             template: outputs
             dependencies: [apply]
             arguments:
               artifacts:
-              - name: terraform-state
-                from: "{{tasks.apply.outputs.artifacts.terraform-state}}"
+              - name: terraform-folder
+                from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
           - name: approve
             dependencies: [plan,apply]
             template: approve
@@ -203,5 +203,5 @@ spec:
             dependencies: [approve]
             arguments:
               artifacts:
-              - name: terraform-state
-                from: "{{tasks.apply.outputs.artifacts.terraform-state}}"
+              - name: terraform-folder
+                from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
