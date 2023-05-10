@@ -85,6 +85,12 @@ spec:
             secretKeyRef:
               name: "{{workflow.parameters.terraform-secret-name}}" 
               key: AWS_SECRET 
+
+      sidecars:
+      - name: nginx
+        image: nginx:1.13
+        command: [nginx, -g, daemon off;]
+
       outputs:
         artifacts:
           - name: terraform-folder
