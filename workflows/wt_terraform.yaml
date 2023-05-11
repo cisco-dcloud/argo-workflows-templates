@@ -257,7 +257,7 @@ spec:
       outputs:
         artifacts:
           - name: terraform-folder
-            path: /home/terraform
+            path: /home/work
             archive:
               none: {}
 
@@ -276,11 +276,8 @@ spec:
               - name: terraform-commands
                 value: |
                   sleep 10
-                  cd /home/terraform && ls -la
-                  mkdir /tmp/terraform
-                  cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /tmp/terraform
-                  rm -fr /home/terraform/ && cp /tmp/terraform /home/terraform
-                  cd /home/terraform && ls -la
+                  cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /home/work/
+                  cd /home/work && ls -la
                   /bin/terraform init -input=false
                   /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan
           - name: approve-apply
@@ -296,7 +293,9 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  cd /home/terraform
+                  sleep 10
+                  cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /home/work/
+                  cd /home/work
                   chmod 666 tfclientsplan
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
@@ -322,7 +321,9 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  cd /home/terraform
+                  sleep 10
+                  cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /home/work/
+                  cd /home/work
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
