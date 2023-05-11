@@ -275,6 +275,7 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
+                  cd /home/terraform && ls -la
                   mkdir /tmp/terraform
                   cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /tmp/terraform
                   rm -fr /home/terraform/ && cp /tmp/terraform /home/terraform
