@@ -308,7 +308,7 @@ spec:
               - name: terraform-folder
                 from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
           - name: approve-destroy
-            dependencies: [plan,outputs]
+            dependencies: [outputs]
             template: approve
           - name: destroy
             template: terraformscript
