@@ -220,9 +220,7 @@ spec:
         imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
-        source: |
-          sleep 10
-          "{{inputs.parameters.terraform-commands}}" 
+        source: "{{inputs.parameters.terraform-commands}}" 
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
