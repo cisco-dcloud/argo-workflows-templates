@@ -14,6 +14,8 @@ spec:
       value: "terraform_examples/random"      
     - name: terraform-secret-name
       value: ""  
+    - name: vpn-secret-name
+      value: ""
 
   templates:
     - name: plan
@@ -85,12 +87,6 @@ spec:
             secretKeyRef:
               name: "{{workflow.parameters.terraform-secret-name}}" 
               key: AWS_SECRET 
-
-      sidecars:
-      - name: nginx
-        image: nginx:1.13
-        command: [nginx, -g, daemon off;]
-
       outputs:
         artifacts:
           - name: terraform-folder
@@ -211,3 +207,123 @@ spec:
               artifacts:
               - name: terraform-folder
                 from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
+
+    - name: terraformScript
+      inputs:
+        artifacts:
+        - name: terraform
+          path: /home/terraform
+        parameters:
+        - name: terraform-commands
+          value: ""
+      script:
+        imagePullPolicy: "IfNotPresent"
+        image: "{{workflow.parameters.terraform-docker-image}}"
+        command: ["sh"]
+        source: |
+          "{{inputs.parameters.terraform-commands}}" >> /tmp/terraform-change.log
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_KEY 
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.terraform-secret-name}}" 
+              key: AWS_SECRET 
+      sidecars:
+      - name: openvpn
+        image: mgarciasanes/openconnect
+        env:
+        - name: VPN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.vpn-secret-name}}" 
+              key: VPN_PASSWORD 
+        - name: VPN_LOGIN
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.vpn-secret-name}}" 
+              key: VPN_LOGIN 
+        - name: VPN_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: "{{workflow.parameters.vpn-secret-name}}" 
+              key: VPN_SERVER 
+      outputs:
+        artifacts:
+          - name: terraform-folder
+            path: /home/terraform
+            archive:
+              none: {}
+          - name: terraform-log
+            path: /tmp/terraform-change.log
+            archive:
+              none: {}
+
+    - name: terraform-scripts-auto-approve
+      dag:
+        tasks:
+          - name: plan
+            template: terraformScript
+            arguments:
+              artifacts:
+              - name: terraform-folder
+                git:
+                  repo: "{{workflow.parameters.terraform-script-repository}}"
+                  depth: 1
+              parameters:
+              - name: terraform-commands
+                value: |
+                  mkdir /tmp/terraform
+                  cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /tmp/terraform
+                  rm -fr /home/terraform/ && cp /tmp/terraform /home/terraform
+                  cd /home/terraform
+                  /bin/terraform init -input=false
+                  /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan
+          - name: approve-apply
+            dependencies: [plan]
+            template: approve
+          - name: apply
+            template: terraformScript
+            dependencies: [plan]
+            arguments:
+              artifacts:
+              - name: terraform-folder
+                from: "{{tasks.plan.outputs.artifacts.terraform-folder}}"
+              parameters:
+              - name: terraform-commands
+                value: |
+                  cd /home/terraform
+                  chmod 666 tfclientsplan
+                  chmod 644 *.tf
+                  chmod 644 .terraform.lock.hcl
+                  chmod -R 755 .terraform
+                  /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
+          - name: outputs
+            template: outputs
+            dependencies: [apply]
+            arguments:
+              artifacts:
+              - name: terraform-folder
+                from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
+          - name: approve-destroy
+            dependencies: [plan,apply]
+            template: approve
+          - name: destroy
+            template: destroy
+            dependencies: [approve]
+            arguments:
+              artifacts:
+              - name: terraform-folder
+                from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
+              parameters:
+              - name: terraform-commands
+                value: |
+                  cd /home/terraform
+                  chmod 644 *.tf
+                  chmod 644 .terraform.lock.hcl
+                  chmod -R 755 .terraform
+                  /bin/terraform destroy -auto-approve -input=false -parallelism=2 -no-color
