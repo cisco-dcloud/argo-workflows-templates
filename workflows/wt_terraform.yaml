@@ -293,7 +293,7 @@ spec:
               - name: terraform-commands
                 value: |
                   sleep 10
-                  mkdir /home/work && cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /home/work/ && cd /home/work && ls -la
+                  mkdir /home/work && cp /home/terraform/* /home/work/ && cd /home/work && ls -la
                   chmod 666 tfclientsplan
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
@@ -320,7 +320,7 @@ spec:
               - name: terraform-commands
                 value: |
                   sleep 10
-                  mkdir /home/work && cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /home/work/ && cd /home/work && ls -la
+                  mkdir /home/work && cp /home/terraform/* /home/work/ && cd /home/work && ls -la
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
