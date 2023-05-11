@@ -211,7 +211,7 @@ spec:
     - name: terraformScript
       inputs:
         artifacts:
-        - name: terraform
+        - name: terraform-folder
           path: /home/terraform
         parameters:
         - name: terraform-commands
