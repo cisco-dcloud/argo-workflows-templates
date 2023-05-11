@@ -208,7 +208,7 @@ spec:
               - name: terraform-folder
                 from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
 
-    - name: terraformScript
+    - name: terraformscript
       inputs:
         artifacts:
         - name: terraform-folder
@@ -267,7 +267,7 @@ spec:
       dag:
         tasks:
           - name: plan
-            template: terraformScript
+            template: terraformscript
             arguments:
               artifacts:
               - name: terraform-folder
@@ -287,7 +287,7 @@ spec:
             dependencies: [plan]
             template: approve
           - name: apply
-            template: terraformScript
+            template: terraformscript
             dependencies: [plan,approve-apply]
             arguments:
               artifacts:
@@ -313,7 +313,7 @@ spec:
             dependencies: [plan,outputs]
             template: approve
           - name: destroy
-            template: destroy
+            template: terraformscript
             dependencies: [approve-destroy]
             arguments:
               artifacts:
