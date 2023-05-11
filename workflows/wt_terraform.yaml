@@ -237,6 +237,8 @@ spec:
       - name: openvpn
         image: mgarciasanes/openconnect
         imagePullPolicy: "Always"
+        securityContext:
+          privileged: true
         env:
         - name: VPN_PASSWORD
           valueFrom:
