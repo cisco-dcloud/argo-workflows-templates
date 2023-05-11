@@ -236,6 +236,7 @@ spec:
       sidecars:
       - name: openvpn
         image: mgarciasanes/openconnect
+        imagePullPolicy: "Always"
         env:
         - name: VPN_PASSWORD
           valueFrom:
