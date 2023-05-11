@@ -293,6 +293,7 @@ spec:
               - name: terraform-commands
                 value: |
                   sleep 10
+                  ls -la /home/terraform
                   mkdir /home/work && cp /home/terraform/* /home/work/ && cd /home/work && ls -la
                   chmod 666 tfclientsplan
                   chmod 644 *.tf
@@ -320,6 +321,7 @@ spec:
               - name: terraform-commands
                 value: |
                   sleep 10
+                  ls -la /home/terraform
                   mkdir /home/work && cp /home/terraform/* /home/work/ && cd /home/work && ls -la
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
