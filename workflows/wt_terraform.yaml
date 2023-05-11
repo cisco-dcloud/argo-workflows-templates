@@ -221,6 +221,7 @@ spec:
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: |
+          sleep 10
           "{{inputs.parameters.terraform-commands}}" >> /tmp/terraform-change.log
         env:
         - name: AWS_ACCESS_KEY_ID
