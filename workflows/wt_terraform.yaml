@@ -222,7 +222,7 @@ spec:
         command: ["sh"]
         source: |
           sleep 10
-          "{{inputs.parameters.terraform-commands}}" >> /tmp/terraform-change.log
+          "{{inputs.parameters.terraform-commands}}" 
         env:
         - name: AWS_ACCESS_KEY_ID
           valueFrom:
@@ -262,10 +262,6 @@ spec:
             path: /home/terraform
             archive:
               none: {}
-          - name: terraform-log
-            path: /tmp/terraform-change.log
-            archive:
-              none: {}
 
     - name: terraform-scripts-auto-approve
       dag:
@@ -284,7 +280,7 @@ spec:
                   mkdir /tmp/terraform
                   cp /home/terraform/{{workflow.parameters.terraform-script-path}}/* /tmp/terraform
                   rm -fr /home/terraform/ && cp /tmp/terraform /home/terraform
-                  cd /home/terraform
+                  cd /home/terraform && ls -la
                   /bin/terraform init -input=false
                   /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan
           - name: approve-apply
@@ -292,7 +288,7 @@ spec:
             template: approve
           - name: apply
             template: terraformscript
-            dependencies: [plan,approve-apply]
+            dependencies: [approve-apply]
             arguments:
               artifacts:
               - name: terraform-folder
