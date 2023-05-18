@@ -1,5 +1,4 @@
 provider "vsphere" {
-  version              = "~> 1.4"
   user                 = var.vsphere_username
   password             = var.vsphere_password
   vsphere_server       = var.vsphere_servers[var.vsphere_datacentre]
