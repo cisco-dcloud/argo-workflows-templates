@@ -12,10 +12,6 @@ spec:
       value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
     - name: terraform-script-path
       value: "terraform_examples/vsphere"      
-    - name: terraform-secret-name
-      value: ""  
-    - name: vpn-secret-name
-      value: ""
 
   templates:
     - name: outputs
@@ -75,19 +71,6 @@ spec:
             secretKeyRef:
               name: vsphere-credentials # name of k8s secret
               key: vsphere_ip     # 'key' subcomponent of the secret
-      sidecars:
-      - name: openvpn
-        image: mgarciasanes/openconnect
-        imagePullPolicy: "Always"
-        securityContext:
-          privileged: true
-        env:
-        - name: VPN_PASSWORD
-          value: ""
-        - name: VPN_LOGIN
-          value: ""
-        - name: VPN_SERVER
-          value: ""
       outputs:
         artifacts:
           - name: terraform-folder
