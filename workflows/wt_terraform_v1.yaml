@@ -56,17 +56,17 @@ spec:
         command: ["sh"]
         source: "{{inputs.parameters.terraform-commands}}" 
         env:
-        - name: VSPHERE_USERNAME  # name of env var
+        - name: TF_VAR_vsphere_username  # name of env var
           valueFrom:
             secretKeyRef:
               name: vsphere-credentials # name of k8s secret
               key: username     # 'key' subcomponent of the secret
-        - name: VSPHERE_PASSWORD  # name of env var
+        - name: TF_VAR_vsphere_password  # name of env var
           valueFrom:
             secretKeyRef:
               name: vsphere-credentials # name of k8s secret
               key: password     # 'key' subcomponent of the secret
-        - name: VSPHERE_IP  # name of env var
+        - name: TF_VAR_vsphere_server  # name of env var
           valueFrom:
             secretKeyRef:
               name: vsphere-credentials # name of k8s secret

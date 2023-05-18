@@ -119,6 +119,10 @@ variable "vsphere_servers" {
   }
 }
 
+variable "vsphere_server" {
+  type = string
+}
+
 variable "vsphere_username" {
   description = "vSphere username"
   type        = string
