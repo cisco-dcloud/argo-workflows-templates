@@ -21,7 +21,7 @@ dc_name = {
   }
 
 pool_name = {
-    idev = "vPod_Cluster_A"
+    idev = "vPod_Cluster_A/Resources"
   }
 
 vm_template = {
