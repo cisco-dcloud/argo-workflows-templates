@@ -91,7 +91,7 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  sleep 10
+                  echo $TF_VAR_vsphere_server
                   mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work && ls -la
                   /bin/terraform init -input=false
                   /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan
@@ -108,7 +108,6 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  sleep 10
                   ls -la /home/terraform
                   mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
                   chmod 666 tfclientsplan
@@ -136,7 +135,6 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  sleep 10
                   ls -la /home/terraform
                   mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
                   chmod 644 *.tf
