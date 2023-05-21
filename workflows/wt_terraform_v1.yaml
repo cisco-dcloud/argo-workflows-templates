@@ -4,6 +4,8 @@ metadata:
   name: terraform-draft
 spec:
   entrypoint: terraform-scripts-auto-approve
+  serviceAccountName: argo-workflow
+  # onExit: exit-handler
   arguments:
     parameters:
     - name: terraform-docker-image
@@ -40,8 +42,22 @@ spec:
           - name: terraform-outputs
             valueFrom: 
               path: /tmp/tf_outputs.json
+
     - name: approve
       suspend: {}
+      inputs:
+          parameters:
+            - name: approve
+              default: 'NO'
+              enum:
+                  - 'YES'
+                  - 'NO'
+      outputs:
+        parameters:
+            - name: approve
+              valueFrom:
+                supplied: {}
+
     - name: terraformscript
       inputs:
         artifacts:
@@ -101,6 +117,7 @@ spec:
           - name: apply
             template: terraformscript
             dependencies: [approve-apply]
+            when: '{{tasks.approve-apply.outputs.parameters.approve}} == YES'
             arguments:
               artifacts:
               - name: terraform-folder
@@ -128,6 +145,7 @@ spec:
           - name: destroy
             template: terraformscript
             dependencies: [approve-destroy]
+            when: '{{tasks.approve-destroy.outputs.parameters.approve}} == YES'
             arguments:
               artifacts:
               - name: terraform-folder
@@ -141,3 +159,26 @@ spec:
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
                   /bin/terraform destroy -auto-approve -input=false -parallelism=2 -no-color
+
+    # - name: exit-handler
+    #   dag:
+    #     tasks:
+    #       - name: approve-destroy
+    #         template: approve
+    #       - name: destroy
+    #         template: terraformscript
+    #         dependencies: [approve-destroy]
+    #         when: '{{tasks.approve-destroy.outputs.parameters.approve}} == YES'
+    #         arguments:
+    #           artifacts:
+    #           - name: terraform-folder
+    #             from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
+    #           parameters:
+    #           - name: terraform-commands
+    #             value: |
+    #               ls -la /home/terraform
+    #               mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
+    #               chmod 644 *.tf
+    #               chmod 644 .terraform.lock.hcl
+    #               chmod -R 755 .terraform
+    #               /bin/terraform destroy -auto-approve -input=false -parallelism=2 -no-color
