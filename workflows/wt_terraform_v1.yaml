@@ -3,7 +3,7 @@ kind: WorkflowTemplate
 metadata:
   name: terraform-draft
 spec:
-  entrypoint: terraform-scripts-auto-approve
+  entrypoint: default
   serviceAccountName: argo-workflow
   # onExit: exit-handler
   arguments:
@@ -93,7 +93,67 @@ spec:
             path: /home/work
             archive:
               none: {}
-    - name: terraform-scripts-auto-approve
+
+    - name: with-vpn
+      inputs:
+        artifacts:
+        - name: terraform-folder
+          path: /home/terraform
+        parameters:
+        - name: terraform-commands
+          value: ""
+      script:
+        imagePullPolicy: "IfNotPresent"
+        image: "{{workflow.parameters.terraform-docker-image}}"
+        command: ["sh"]
+        source: "{{inputs.parameters.terraform-commands}}" 
+        env:
+        - name: TF_VAR_vsphere_username  # name of env var
+          valueFrom:
+            secretKeyRef:
+              name: vsphere-credentials # name of k8s secret
+              key: username     # 'key' subcomponent of the secret
+        - name: TF_VAR_vsphere_password  # name of env var
+          valueFrom:
+            secretKeyRef:
+              name: vsphere-credentials # name of k8s secret
+              key: password     # 'key' subcomponent of the secret
+        - name: TF_VAR_vsphere_server  # name of env var
+          valueFrom:
+            secretKeyRef:
+              name: vsphere-credentials # name of k8s secret
+              key: vsphere_ip     # 'key' subcomponent of the secret
+      sidecars:
+        - name: openvpn
+          image: mgarciasanes/openconnect
+          imagePullPolicy: "Always"
+          securityContext:
+            privileged: true
+          env:
+          - name: VPN_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: "{{workflow.parameters.vpn-secret-name}}" 
+                key: VPN_PASSWORD 
+          - name: VPN_LOGIN
+            valueFrom:
+              secretKeyRef:
+                name: "{{workflow.parameters.vpn-secret-name}}" 
+                key: VPN_LOGIN 
+          - name: VPN_SERVER
+            valueFrom:
+              secretKeyRef:
+                name: "{{workflow.parameters.vpn-secret-name}}" 
+                key: VPN_SERVER 
+      outputs:
+        artifacts:
+          - name: terraform-folder
+            path: /home/work
+            archive:
+              none: {}
+
+
+    - name: default
       dag:
         tasks:
           - name: plan
