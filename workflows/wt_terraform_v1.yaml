@@ -87,43 +87,7 @@ spec:
             secretKeyRef:
               name: vsphere-credentials # name of k8s secret
               key: vsphere_ip     # 'key' subcomponent of the secret
-      outputs:
-        artifacts:
-          - name: terraform-folder
-            path: /home/work
-            archive:
-              none: {}
-
-    - name: with-vpn
-      inputs:
-        artifacts:
-        - name: terraform-folder
-          path: /home/terraform
-        parameters:
-        - name: terraform-commands
-          value: ""
-      script:
-        imagePullPolicy: "IfNotPresent"
-        image: "{{workflow.parameters.terraform-docker-image}}"
-        command: ["sh"]
-        source: "{{inputs.parameters.terraform-commands}}" 
-        env:
-        - name: TF_VAR_vsphere_username  # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: vsphere-credentials # name of k8s secret
-              key: username     # 'key' subcomponent of the secret
-        - name: TF_VAR_vsphere_password  # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: vsphere-credentials # name of k8s secret
-              key: password     # 'key' subcomponent of the secret
-        - name: TF_VAR_vsphere_server  # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: vsphere-credentials # name of k8s secret
-              key: vsphere_ip     # 'key' subcomponent of the secret
-      sidecars:
+      sidecars: 
         - name: openvpn
           image: mgarciasanes/openconnect
           imagePullPolicy: "Always"
@@ -152,7 +116,6 @@ spec:
             archive:
               none: {}
 
-
     - name: default
       dag:
         tasks:
@@ -167,6 +130,7 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
+                  sleep 10
                   echo $TF_VAR_vsphere_server
                   mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work && ls -la
                   /bin/terraform init -input=false
@@ -177,6 +141,8 @@ spec:
           - name: apply
             template: terraformscript
             dependencies: [approve-apply]
+            continueOn:
+              failed: true
             when: '{{tasks.approve-apply.outputs.parameters.approve}} == YES'
             arguments:
               artifacts:
@@ -185,6 +151,7 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
+                  sleep 10
                   ls -la /home/terraform
                   mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
                   chmod 666 tfclientsplan
@@ -213,6 +180,7 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
+                  sleep 10
                   ls -la /home/terraform
                   mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
                   chmod 644 *.tf

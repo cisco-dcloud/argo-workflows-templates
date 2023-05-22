@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: terraform-
+spec:
+  workflowTemplateRef:
+    name: terraform
+  #Will delete artifacts when the workflow is deleted
+  artifactGC:
+    strategy: OnWorkflowDeletion  #Artifacts can be deleted OnWorkflowCompletion or OnWorkflowDeletion
+  entrypoint: terraform-scripts-auto-approve
+  arguments:
+    parameters:     
+    - name: terraform-secret-name
+      value: "tf-sandboxes"
+    - name: vpn-secret-name
+      value: "tf-sandboxes-vpn"
+    - name: terraform-script-path
+      value: "terraform_examples/sandbox"
