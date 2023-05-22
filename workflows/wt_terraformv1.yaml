@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: WorkflowTemplate
 metadata:
-  name: terraform-v1
+  name: terraformv1
 spec:
   entrypoint: default
   serviceAccountName: argo-workflow

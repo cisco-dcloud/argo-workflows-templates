@@ -4,11 +4,11 @@ metadata:
   generateName: terraform-
 spec:
   workflowTemplateRef:
-    name: terraform
+    name: terraformv1
   #Will delete artifacts when the workflow is deleted
   artifactGC:
     strategy: OnWorkflowDeletion  #Artifacts can be deleted OnWorkflowCompletion or OnWorkflowDeletion
-  entrypoint: terraform-scripts-auto-approve
+  entrypoint: default
   arguments:
     parameters:     
     - name: terraform-secret-name
