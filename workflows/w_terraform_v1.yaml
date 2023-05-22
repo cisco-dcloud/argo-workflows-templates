@@ -16,4 +16,4 @@ spec:
     - name: vpn-secret-name
       value: "tf-sandboxes-vpn"
     - name: terraform-script-path
-      value: "terraform_examples/sandbox"
+      value: "terraform_examples/vsphere"
