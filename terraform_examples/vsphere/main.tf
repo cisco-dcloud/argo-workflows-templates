@@ -15,7 +15,7 @@ module "vm_creation" {
   vmgateway                   = each.value.vmgateway
   vmrp                        = var.pool_name[var.vsphere_datacentre]
   vmtemp                      = var.vm_template[var.vsphere_datacentre]
-  firmware                    = "EFI"
+  firmware                    = "efi"
   efi_secure_boot             = true
   wait_for_guest_net_routable = false
 
