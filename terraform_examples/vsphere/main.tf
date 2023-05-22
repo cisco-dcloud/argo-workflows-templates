@@ -16,7 +16,7 @@ module "vm_creation" {
   vmrp                        = var.pool_name[var.vsphere_datacentre]
   vmtemp                      = var.vm_template[var.vsphere_datacentre]
   firmware                    = "bios" #efi or bios
-  efi_secure_boot             = true
+  # efi_secure_boot             = true
   wait_for_guest_net_routable = false
 
 }
