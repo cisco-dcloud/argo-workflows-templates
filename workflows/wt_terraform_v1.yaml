@@ -131,7 +131,10 @@ spec:
               - name: terraform-commands
                 value: |
                   sleep 10
+                  echo "----"
                   echo $TF_VAR_vsphere_server
+                  echo $TF_VAR_vsphere_username
+                  echo "----"
                   mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work && ls -la
                   /bin/terraform init -input=false
                   /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan
