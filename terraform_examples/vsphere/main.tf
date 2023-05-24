@@ -68,7 +68,7 @@ resource "vsphere_virtual_machine" "vm" {
     template_uuid = data.vsphere_virtual_machine.template.id
     customize {
       linux_options {
-        # host_name = "hello-world"
+        host_name = "hello-world"
         # domain    = "example.com"
       }
       network_interface {
