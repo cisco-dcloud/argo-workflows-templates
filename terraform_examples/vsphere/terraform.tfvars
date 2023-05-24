@@ -1,4 +1,4 @@
-vsphere_datacentre = "vpod"
+vsphere_datacentre = "idev"
 domain_name        = "idev.ciscodcloud.com"
 dns_search         = ["idev.ciscodcloud.com"]
 folder_name        = "argo"
@@ -7,48 +7,31 @@ vm = {
     vmname    = "argo-example-server-0",
     vmgateway = "198.18.128.1"
     network = {
-      "Services Network" = ["198.18.128.200"],
+      "pp-vlan1970" = ["198.18.128.200"],
     }
   }
-  example_vm_1 = {
-    vmname    = "argo-example-server-1",
-    vmgateway = "198.18.128.1"
-    network = {
-      "Services Network" = ["198.18.128.201"],
-    }
-  }
-  example_vm_2 = {
-    vmname    = "argo-example-server-2",
-    vmgateway = "198.18.128.1"
-    network = {
-      "Services Network" = ["198.18.128.202"],
-    }
-  }
-
 }
 
-
-
 datastore_name = {
-    vpod    = "NFS"
+    idev    = "nfs_delta_238"
   }
 
 dc_name = {
-    vpod = "dCloud-DC"
+    idev = "vPods"
   }
 
 pool_name = {
-    vpod = "dCloud-Cluster/Resources"
+    idev = "vPod_Cluster_A/Resources"
   }
 
 vm_template = {
-    vpod = "Centos7"
+    idev = "argotestvm"
   }
 
 cluster_name = {
-    vpod = "dCloud-Cluster"
+    idev = "vPod_Cluster_A"
   }
 
 network_name = {
-    vpod = "Services Network"
+    idev = "pp-vlan1970"
   }
