@@ -71,10 +71,10 @@ resource "vsphere_virtual_machine" "vm" {
         host_name = "hello-world"
         domain    = "example.com"
       }
-      # network_interface {
-      #   ipv4_address = "10.1.23.185"
-      #   ipv4_netmask = 24
-      # }
+      network_interface {
+        ipv4_address = "198.18.128.200"
+        ipv4_netmask = 24
+      }
       ipv4_gateway = "198.18.128.1"
     }
   }
