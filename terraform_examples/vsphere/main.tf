@@ -69,12 +69,12 @@ resource "vsphere_virtual_machine" "vm" {
     customize {
       linux_options {
         host_name = "hello-world"
-        # domain    = "example.com"
+        domain    = "example.com"
       }
-      network_interface {
-        ipv4_address = "10.1.23.185"
-        ipv4_netmask = 24
-      }
+      # network_interface {
+      #   ipv4_address = "10.1.23.185"
+      #   ipv4_netmask = 24
+      # }
       ipv4_gateway = "198.18.128.1"
     }
   }
