@@ -25,6 +25,32 @@ variable "dc_name" {
   }
 }
 
+variable "cluster_name" {
+  description = "Cluster name"
+  type        = map
+  default = {
+    idev = "IDEV-Platform-DC"
+    lon  = "LON-Platform-DC"
+    rtp  = "RTP-Platform-DC"
+    sng  = "SNG-Platform-DC"
+    sjc  = "SJC-Platform-DC"
+    syd  = "SYD-Platform-DC"
+  }
+}
+
+variable "network_name" {
+  description = "Network name"
+  type        = map
+  default = {
+    idev = "IDEV-Platform-DC"
+    lon  = "LON-Platform-DC"
+    rtp  = "RTP-Platform-DC"
+    sng  = "SNG-Platform-DC"
+    sjc  = "SJC-Platform-DC"
+    syd  = "SYD-Platform-DC"
+  }
+}
+
 variable "dns_list" {
   description = "dns server list"
   type        = list
