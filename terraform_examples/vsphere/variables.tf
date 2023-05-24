@@ -88,13 +88,13 @@ variable "pool_name" {
   }
 }
 
-# variable "vm" {
-#   type = map(object({
-#     network   = map(list(string))
-#     vmname    = string
-#     vmgateway = string
-#   }))
-# }
+variable "vm" {
+  type = map(object({
+    network   = map(list(string))
+    vmname    = string
+    vmgateway = string
+  }))
+}
 
 variable "vm_cpu" {
   description = "Number of CPUs"
