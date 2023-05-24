@@ -16,5 +16,6 @@
 output vm {
   description = "VM"
   value = vsphere_virtual_machine.vm
+  sensitive = true
 }
 
