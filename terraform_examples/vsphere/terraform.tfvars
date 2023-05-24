@@ -12,6 +12,9 @@
 #   }
 # }
 
+
+vsphere_datacentre = "vpod"
+
 datastore_name = {
     vpod    = "NFS"
   }
