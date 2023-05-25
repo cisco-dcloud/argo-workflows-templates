@@ -24,6 +24,27 @@ vm = {
       "pp-vlan1970" = ["198.18.128.202"],
     }
   }
+  example_vm_3 = {
+    vmname    = "argo-example-server-3",
+    vmgateway = "198.18.128.1"
+    network = {
+      "pp-vlan1970" = ["198.18.128.203"],
+    }
+  }
+  example_vm_4 = {
+    vmname    = "argo-example-server-4",
+    vmgateway = "198.18.128.1"
+    network = {
+      "pp-vlan1970" = ["198.18.128.204"],
+    }
+  }
+  example_vm_5 = {
+    vmname    = "argo-example-server-5",
+    vmgateway = "198.18.128.1"
+    network = {
+      "pp-vlan1970" = ["198.18.128.205"],
+    }
+  }
 
 
 }
