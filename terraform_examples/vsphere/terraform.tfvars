@@ -10,6 +10,22 @@ vm = {
       "pp-vlan1970" = ["198.18.128.200"],
     }
   }
+  example_vm_1 = {
+    vmname    = "argo-example-server-1",
+    vmgateway = "198.18.128.1"
+    network = {
+      "pp-vlan1970" = ["198.18.128.201"],
+    }
+  }
+  example_vm_2 = {
+    vmname    = "argo-example-server-2",
+    vmgateway = "198.18.128.1"
+    network = {
+      "pp-vlan1970" = ["198.18.128.202"],
+    }
+  }
+
+
 }
 
 datastore_name = {

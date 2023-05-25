@@ -87,28 +87,28 @@ spec:
             secretKeyRef:
               name: vsphere-credentials # name of k8s secret
               key: vsphere_ip     # 'key' subcomponent of the secret
-      sidecars: 
-        - name: openvpn
-          image: mgarciasanes/openconnect
-          imagePullPolicy: "Always"
-          securityContext:
-            privileged: true
-          env:
-          - name: VPN_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: "{{workflow.parameters.vpn-secret-name}}" 
-                key: VPN_PASSWORD 
-          - name: VPN_LOGIN
-            valueFrom:
-              secretKeyRef:
-                name: "{{workflow.parameters.vpn-secret-name}}" 
-                key: VPN_LOGIN 
-          - name: VPN_SERVER
-            valueFrom:
-              secretKeyRef:
-                name: "{{workflow.parameters.vpn-secret-name}}" 
-                key: VPN_SERVER 
+      # sidecars: 
+      #   - name: openvpn
+      #     image: mgarciasanes/openconnect
+      #     imagePullPolicy: "Always"
+      #     securityContext:
+      #       privileged: true
+      #     env:
+      #     - name: VPN_PASSWORD
+      #       valueFrom:
+      #         secretKeyRef:
+      #           name: "{{workflow.parameters.vpn-secret-name}}" 
+      #           key: VPN_PASSWORD 
+      #     - name: VPN_LOGIN
+      #       valueFrom:
+      #         secretKeyRef:
+      #           name: "{{workflow.parameters.vpn-secret-name}}" 
+      #           key: VPN_LOGIN 
+      #     - name: VPN_SERVER
+      #       valueFrom:
+      #         secretKeyRef:
+      #           name: "{{workflow.parameters.vpn-secret-name}}" 
+      #           key: VPN_SERVER 
       outputs:
         artifacts:
           - name: terraform-folder
