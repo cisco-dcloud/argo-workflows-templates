@@ -28,27 +28,3 @@ vm = {
 }
 
 
-
-datastore_name = {
-    vpod    = "NFS"
-  }
-
-dc_name = {
-    vpod = "dCloud-DC"
-  }
-
-pool_name = {
-    vpod = "dCloud-Cluster/Resources"
-  }
-
-vm_template = {
-    vpod = "Centos7"
-  }
-
-cluster_name = {
-    vpod = "dCloud-Cluster"
-  }
-
-network_name = {
-    vpod = "Services Network"
-  }

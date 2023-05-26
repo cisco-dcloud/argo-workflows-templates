@@ -3,7 +3,8 @@ variable "datastore_name" {
   description = "Provide the datastore name"
   type        = map
   default = {
-    idev = "idev_nfs_plat_hx"
+    vpod = "NFS"
+    idev = "nfs_delta_238"
     lon  = "lon_nfs_plat_hx"
     rtp  = "rtp_nfs_plat_hx"
     sng  = "sng_nfs_plat_hx"
@@ -16,7 +17,8 @@ variable "dc_name" {
   description = "Datacenter name"
   type        = map
   default = {
-    idev = "IDEV-Platform-DC"
+    vpod = "dCloud-DC"
+    idev = "vPods"
     lon  = "LON-Platform-DC"
     rtp  = "RTP-Platform-DC"
     sng  = "SNG-Platform-DC"
@@ -29,7 +31,8 @@ variable "cluster_name" {
   description = "Cluster name"
   type        = map
   default = {
-    idev = "IDEV-Platform-DC"
+    vpod = "dCloud-Cluster"
+    idev = "vPod_Cluster_A"
     lon  = "LON-Platform-DC"
     rtp  = "RTP-Platform-DC"
     sng  = "SNG-Platform-DC"
@@ -42,7 +45,8 @@ variable "network_name" {
   description = "Network name"
   type        = map
   default = {
-    idev = "IDEV-Platform-DC"
+    vpod = "Services Network"
+    idev = "pp-vlan1970"
     lon  = "LON-Platform-DC"
     rtp  = "RTP-Platform-DC"
     sng  = "SNG-Platform-DC"
@@ -79,7 +83,8 @@ variable "pool_name" {
   description = "Resource pool name"
   type        = map
   default = {
-    idev = "idev-ucs-plat-hx/Resources"
+    vpod = "dCloud-Cluster/Resources"
+    idev = "vPod_Cluster_A/Resources"
     lon  = "lon-ucs-plat-hx/Resources"
     rtp  = "rtp-ucs-plat-hx/Resources"
     sng  = "sng-ucs-plat-hx/Resources"
@@ -112,7 +117,8 @@ variable "vm_template" {
   description = "Provide the datastore name"
   type        = map
   default = {
-    idev = "centos7_common-28-10-2021"
+    vpod = "Centos7"
+    idev = "argotestvm"
     lon  = "centos7_common-28-10-2021"
     rtp  = "centos7_common-28-10-2021"
     sng  = "centos7_common-28-10-2021"
@@ -133,17 +139,6 @@ variable "vsphere_password" {
   default     = ""
 }
 
-variable "vsphere_servers" {
-  type = map
-  default = {
-    idev = "192.133.202.26:443"
-    lon  = "64.103.46.16:443"
-    rtp  = "64.100.12.52:443"
-    sng  = "173.39.116.32:443"
-    sjc  = "128.107.93.161:443"
-    syd  = "64.104.251.16:443"
-  }
-}
 
 variable "vsphere_server" {
   type = string

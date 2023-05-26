@@ -45,30 +45,4 @@ vm = {
       "pp-vlan1970" = ["198.18.128.205"],
     }
   }
-
-
 }
-
-datastore_name = {
-    idev    = "nfs_delta_238"
-  }
-
-dc_name = {
-    idev = "vPods"
-  }
-
-pool_name = {
-    idev = "vPod_Cluster_A/Resources"
-  }
-
-vm_template = {
-    idev = "argotestvm"
-  }
-
-cluster_name = {
-    idev = "vPod_Cluster_A"
-  }
-
-network_name = {
-    idev = "pp-vlan1970"
-  }
