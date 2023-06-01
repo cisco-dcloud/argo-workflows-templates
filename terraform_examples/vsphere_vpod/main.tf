@@ -1,3 +1,8 @@
+resource "random_string" "prefix" {
+  length           = 5
+  special          = false
+}
+
 module "vm_creation" {
   for_each                    = var.vm
   source                      = "Terraform-VMWare-Modules/vm/vsphere"
@@ -10,13 +15,15 @@ module "vm_creation" {
   domain                      = var.domain_name
   network                     = each.value.network
   ram_size                    = var.vm_ram
-  staticvmname                = "${var.vsphere_datacentre}-${each.value.vmname}"
+  staticvmname                = "${random_string.prefix.result}-${var.vsphere_datacentre}-${each.value.vmname}"
   vmfolder                    = var.folder_name
   vmgateway                   = each.value.vmgateway
   vmrp                        = var.pool_name[var.vsphere_datacentre]
   vmtemp                      = var.vm_template[var.vsphere_datacentre]
 
 }
+
+
 
 
 # data "vsphere_datacenter" "datacenter" {
