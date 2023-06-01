@@ -8,7 +8,7 @@ module "vm_creation" {
   source                      = "Terraform-VMWare-Modules/vm/vsphere"
   version                     = "3.5.0"
   cpu_number                  = var.vm_cpu
-  dc                          = var.dc_name[var.vsphere_datacentre]
+  dc                          = "dCloud-DC" #var.dc_name[var.vsphere_datacentre]
   disk_datastore              = var.datastore_name[var.vsphere_datacentre]
   dns_server_list             = var.dns_list
   dns_suffix_list             = var.dns_search
