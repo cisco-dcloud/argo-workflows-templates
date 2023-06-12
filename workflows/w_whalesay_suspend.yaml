@@ -23,7 +23,7 @@ spec:
             template: whalesay
           - name: suspend
             dependencies: [whalesay1]
-            template: apprsuspendove
+            template: suspend
           - name: whalesay2
             template: whalesay
             dependencies: [suspend]
