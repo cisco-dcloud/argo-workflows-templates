@@ -7,7 +7,6 @@ metadata:
       This is a simple hello world example.
 spec:
   entrypoint: default
-  serviceAccountName: argo-workflow
   templates:
     - name: suspend
       suspend: {}
