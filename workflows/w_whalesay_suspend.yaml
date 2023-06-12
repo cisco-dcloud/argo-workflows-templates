@@ -1,0 +1,29 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: whalesay-suspend-
+  annotations:
+    workflows.argoproj.io/description: |
+      This is a simple hello world example.
+spec:
+  entrypoint: default
+  serviceAccountName: argo-workflow
+  templates:
+    - name: suspend
+      suspend: {}
+    - name: whalesay             
+      container:
+        image: docker/whalesay
+        command: [cowsay]         
+        args: ["hello {{workflow.name}}"]
+    - name: default
+      dag:
+        tasks:
+          - name: whalesay1
+            template: whalesay
+          - name: suspend
+            dependencies: [whalesay1]
+            template: apprsuspendove
+          - name: whalesay2
+            template: whalesay
+            dependencies: [suspend]
