@@ -4,6 +4,7 @@ metadata:
   generateName: terraform-idac-
 spec:
   entrypoint: main
+  serviceAccountName: "argo-workflow"
   arguments:
     parameters:
     - name: terraform-docker-image
@@ -11,7 +12,7 @@ spec:
     - name: terraform-script-repository
       value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
     - name: terraform-script-path
-      value: "terraform_examples/idac_test"     
+      value: "terraform_examples/idac_test_01"     
     - name: terraform-variables-user
       value: ""  
     - name: terraform-variables-admin
