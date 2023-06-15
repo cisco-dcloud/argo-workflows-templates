@@ -154,4 +154,4 @@ spec:
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
-                  /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color
+                  /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars"
