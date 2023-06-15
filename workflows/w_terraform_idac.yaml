@@ -116,9 +116,9 @@ spec:
                   /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan
                   /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan
               - name: terraform-variables-user
-                value: {{workflow.parameters.terraform-variables-user}}
+                value: "{{workflow.parameters.terraform-variables-user}}"
               - name: terraform-variables-admin
-                value: {{workflow.parameters.terraform-variables-admin}}
+                value: "{{workflow.parameters.terraform-variables-admin}}"
 
           - name: outputs
             template: outputs
