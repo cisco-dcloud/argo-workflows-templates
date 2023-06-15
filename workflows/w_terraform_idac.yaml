@@ -79,7 +79,7 @@ spec:
       outputs:
         artifacts:
           - name: terraform-folder
-            path: /home/work
+            path: /home/terraform
             archive:
               none: {}
 
