@@ -21,27 +21,6 @@ spec:
       value: "2"      
 
   templates:
-    - name: outputs
-      inputs:
-        artifacts:
-        - name: terraform-folder
-          path: /home/current
-      script:
-        imagePullPolicy: "IfNotPresent"
-        image: "{{workflow.parameters.terraform-docker-image}}"
-        command: ["sh"]
-        source: |
-          cd /home/current
-          chmod 666 tfclientsplan
-          chmod 644 *.tf
-          chmod 644 .terraform.lock.hcl
-          chmod -R 755 .terraform
-          /bin/terraform output -json > /tmp/tf_outputs.json
-      outputs:
-        parameters:
-          - name: terraform-outputs
-            valueFrom: 
-              path: /tmp/tf_outputs.json
 
     - name: approve
       suspend: {}
@@ -101,18 +80,13 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  #mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work 
-                  
                   cd /home/terraform/{{workflow.parameters.terraform-script-path}}/
-
                   cat <<-EOF > /home/terraform/{{workflow.parameters.terraform-script-path}}/terraform_user.tfvars
                   {{workflow.parameters.terraform-variables-user}}
                   EOF
-
                   cat <<-EOF > /home/terraform/{{workflow.parameters.terraform-script-path}}/terraform_admin.tfvars
                   {{workflow.parameters.terraform-variables-admin}}
                   EOF
-
                   ls -la
                   pwd
                   /bin/terraform init -input=false
@@ -124,13 +98,6 @@ spec:
               - name: terraform-variables-admin
                 value: "{{workflow.parameters.terraform-variables-admin}}"
 
-          # - name: outputs
-          #   template: outputs
-          #   dependencies: [init-plan-apply]
-          #   arguments:
-          #     artifacts:
-          #     - name: terraform-folder
-          #       from: "{{tasks.init-plan-apply.outputs.artifacts.terraform-folder}}"
           - name: approve-destroy
             dependencies: [init-plan-apply]
             template: approve
@@ -144,14 +111,11 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-
                   cd /home/terraform/{{workflow.parameters.terraform-script-path}}/
-
                   ls -la
                   pwd
-
-                  #mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
                   /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars"
+                  /bin/terraform output -json > /tmp/tf_outputs.json
