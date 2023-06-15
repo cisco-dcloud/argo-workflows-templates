@@ -19,7 +19,7 @@ variable "input_bool" {
 variable "input_list_of_strings" {
   type        = list(string)
   description = "Bogus list of strings"
-  default = [ var.input_string , var.input_string]
+  default = [ "string1" , "string2"]
 }
 
 variable "input_list_of_objects" {
@@ -31,14 +31,14 @@ variable "input_list_of_objects" {
   description = "List of objects"
   default = [
       {
-        my_string_1 = var.input_string
-        my_number_1 = var.input_number
-        my_bool_1   = var.input_bool
+        key1 = "string1"
+        key2 = 1
+        key3   = true
       },
       {
-        my_string_2 = var.input_string
-        my_number_2 = var.input_number
-        my_bool_2   = var.input_bool
+        key1 = "string2"
+        key2 = 2
+        key3   = false
       }      
     ]
 }
