@@ -59,22 +59,22 @@ spec:
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: "{{inputs.parameters.terraform-commands}}" 
-        env:
-        - name: TF_VAR_AWS_ACCESS_KEY_ID   # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: aws-credentials # name of k8s secret
-              key: AWS_ACCESS_KEY_ID     # 'key' subcomponent of the secret
-        - name: TF_VAR_AWS_SECRET_ACCESS_KEY  # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: aws-credentials # name of k8s secret
-              key: AWS_SECRET_ACCESS_KEY      # 'key' subcomponent of the secret
-        - name: TF_VAR_AWS_DEFAULT_REGION   # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: aws-credentials # name of k8s secret
-              key: AWS_DEFAULT_REGION      # 'key' subcomponent of the secret
+        # env:
+        # - name: TF_VAR_AWS_ACCESS_KEY_ID      # name of env var
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: aws-credentials           # name of k8s secret
+        #       key: AWS_ACCESS_KEY_ID          # 'key' subcomponent of the secret
+        # - name: TF_VAR_AWS_SECRET_ACCESS_KEY  
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: aws-credentials
+        #       key: AWS_SECRET_ACCESS_KEY    
+        # - name: TF_VAR_AWS_DEFAULT_REGION  
+        #   valueFrom:
+        #     secretKeyRef:
+        #       name: aws-credentials
+        #       key: AWS_DEFAULT_REGION 
       outputs:
         artifacts:
           - name: terraform-folder
