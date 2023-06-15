@@ -61,17 +61,17 @@ spec:
         command: ["sh"]
         source: "{{inputs.parameters.terraform-commands}}" 
         env:
-        - name: TF_VAR_AWS_ACCESS_KEY_ID      # name of env var
+        - name: AWS_ACCESS_KEY_ID      # name of env var
           valueFrom:
             secretKeyRef:
               name: aws-credentials           # name of k8s secret
               key: AWS_ACCESS_KEY_ID          # 'key' subcomponent of the secret
-        - name: TF_VAR_AWS_SECRET_ACCESS_KEY  
+        - name: AWS_SECRET_ACCESS_KEY  
           valueFrom:
             secretKeyRef:
               name: aws-credentials
               key: AWS_SECRET_ACCESS_KEY    
-        - name: TF_VAR_AWS_DEFAULT_REGION  
+        - name: AWS_DEFAULT_REGION  
           valueFrom:
             secretKeyRef:
               name: aws-credentials
