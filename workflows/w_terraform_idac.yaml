@@ -97,17 +97,20 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work 
+                  #mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work 
+                  
+                  cd /home/terraform/{{workflow.parameters.terraform-script-path}}/
 
-                  cat <<-EOF > /home/work/terraform_user.tfvars
+                  cat <<-EOF > /home/terraform/{{workflow.parameters.terraform-script-path}}/terraform_user.tfvars
                   {{workflow.parameters.terraform-variables-user}}
                   EOF
 
-                  cat <<-EOF > /home/work/terraform_admin.tfvars
+                  cat <<-EOF > /home/terraform/{{workflow.parameters.terraform-script-path}}/terraform_admin.tfvars
                   {{workflow.parameters.terraform-variables-admin}}
                   EOF
 
                   ls -la
+                  pwd
                   /bin/terraform init -input=false
                   /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan
                   /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan
@@ -136,8 +139,13 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  ls -la /home/terraform
-                  mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
+
+                  cd /home/terraform/{{workflow.parameters.terraform-script-path}}/
+
+                  ls -la
+                  pwd
+
+                  #mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
