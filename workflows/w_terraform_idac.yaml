@@ -54,10 +54,6 @@ spec:
         parameters:
         - name: terraform-commands
           value: ""
-        - name: terraform-variables-user
-          value: ""
-        - name: terraform-variables-admin
-          value: ""
           
       script:
         imagePullPolicy: "IfNotPresent"
@@ -104,11 +100,11 @@ spec:
                   mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work 
 
                   cat <<-EOF > /home/work/terraform_user.tfvars
-                  {{inputs.parameters.terraform-variables-user}}
+                  {{workflow.parameters.terraform-variables-user}}
                   EOF
 
                   cat <<-EOF > /home/work/terraform_admin.tfvars
-                  {{inputs.parameters.terraform-variables-admin}}
+                  {{workflow.parameters.terraform-variables-admin}}
                   EOF
 
                   ls -la
