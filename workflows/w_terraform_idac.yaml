@@ -4,7 +4,6 @@ metadata:
   name: terraform-idac
 spec:
   entrypoint: main
-  serviceAccountName: argo-workflow
   arguments:
     parameters:
     - name: terraform-docker-image
