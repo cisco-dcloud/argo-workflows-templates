@@ -122,7 +122,7 @@ spec:
             arguments:
               artifacts:
               - name: terraform-folder
-                from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
+                from: "{{tasks.init-plan-apply.outputs.artifacts.terraform-folder}}"
           - name: approve-destroy
             dependencies: [outputs]
             template: approve
