@@ -78,8 +78,8 @@ spec:
               - name: terraform-folder
                 s3:
                   endpoint: s3.amazonaws.com
-                  bucket: "{{workflow.parameters.terraform-files-bucket}}"
-                  key: "{{workflow.parameters.terraform-files-key}}"
+                  bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
+                  key: "{{workflow.parameters.terraform-files-s3-key}}"
               parameters:
               - name: terraform-commands
                 value: |
