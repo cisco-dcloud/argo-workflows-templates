@@ -83,7 +83,7 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  cd /home/terraform/ && ls -la && tar -xvf {{workflow.parameters.terraform-files-filename}}
+                  cd /home/terraform/ && ls -la && tar -xvf {{workflow.parameters.terraform-files-s3-filename}}
                   ls -la
                   cat <<-EOF > /home/terraform/terraform_user.tfvars
                   {{workflow.parameters.terraform-variables-user}}
