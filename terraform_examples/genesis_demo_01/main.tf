@@ -4,7 +4,7 @@
 #########################
 
 module "dcloud_onprem_vsphere" {
-  source                      = "./common/modules/dcloud-onprem-vsphere/"
+  source                      = "./common/modules/dcloud-onprem-vsphere"
   vsphere_datacentre = var.vsphere_datacentre
   domain_name        = "idev.ciscodcloud.com"
   dns_search         = ["idev.ciscodcloud.com"]
