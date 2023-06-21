@@ -55,6 +55,23 @@ spec:
             secretKeyRef:
               name: aws-credentials
               key: AWS_DEFAULT_REGION 
+        - name: TF_VAR_vsphere_username  # name of env var
+          valueFrom:
+            secretKeyRef:
+              name: vsphere-credentials # name of k8s secret
+              key: username     # 'key' subcomponent of the secret
+        - name: TF_VAR_vsphere_password  # name of env var
+          valueFrom:
+            secretKeyRef:
+              name: vsphere-credentials # name of k8s secret
+              key: password     # 'key' subcomponent of the secret
+        - name: TF_VAR_vsphere_server  # name of env var
+          valueFrom:
+            secretKeyRef:
+              name: vsphere-credentials # name of k8s secret
+              key: vsphere_ip     # 'key' subcomponent of the secret
+
+
       outputs:
         parameters:
           - name: terraform-outputs
