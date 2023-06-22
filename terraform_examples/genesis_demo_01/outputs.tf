@@ -8,7 +8,7 @@ output "onprem_vms" {
 output "openpre_ips" {
   description = "default ip address of the deployed VM"
   value = tomap({
-    for k, i in module.vm_crdcloud_onprem_vsphereeation : k => i.ip
+    for k, i in module.dcloud_onprem_vsphere : k => i.ip
   })
 }
 
