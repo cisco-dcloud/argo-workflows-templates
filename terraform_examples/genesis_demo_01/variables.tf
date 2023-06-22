@@ -24,6 +24,14 @@ variable "vsphere_username" {
   default     = ""
 }
 
+variable "vsphere_foldername" {
+  description = "vSphere VM folder"
+  type        = string
+  default     = "argo"
+}
+
+
+
 #####################
 #   CLOUD AWS INFRA
 #####################

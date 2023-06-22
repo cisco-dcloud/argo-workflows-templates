@@ -8,7 +8,7 @@ module "dcloud_onprem_vsphere" {
   vsphere_datacentre = var.vsphere_datacentre
   domain_name        = "idev.ciscodcloud.com"
   dns_search         = ["idev.ciscodcloud.com"]
-  folder_name        = "argo"
+  folder_name        = var.vsphere_foldername
   vsphere_password   = var.vsphere_password
   vsphere_server     = var.vsphere_server
   vsphere_username   = var.vsphere_username
