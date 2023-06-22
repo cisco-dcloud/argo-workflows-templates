@@ -64,11 +64,17 @@ module "dcloud_onprem_vsphere" {
 
 module "dcloud_cloud_aws_vpc" {
   source                     = "./common/modules/vpc"
+  providers = {
+    aws = aws.default
+  }
   vpc_name                   = "${var.session_owner}-${var.session_id}"
 }
 
 module "dcloud_cloud_aws_ec2" {
   source                     = "./common/modules/ec2"
+  providers = {
+    aws = aws.default
+  }
   vpc                        = module.dcloud_cloud_aws_vpc.vpc
   instances                  = [
                                 {
