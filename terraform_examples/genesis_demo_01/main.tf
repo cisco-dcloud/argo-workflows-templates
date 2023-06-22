@@ -82,6 +82,6 @@ module "dcloud_cloud_aws_ec2" {
                                 ]
 
   depends_on = [
-    dcloud_cloud_aws_vpc.vpc
+    module.dcloud_cloud_aws_vpc
   ]
 }
