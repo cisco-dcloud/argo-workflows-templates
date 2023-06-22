@@ -11,9 +11,13 @@ output "onprem_ips" {
 
 }
 
-# output vm {
-#   description = "VM"
-#   value = vsphere_virtual_machine.vm
-#   sensitive = true
-# }
+output "cloud_vms" {
+
+  value = module.dcloud_cloud_aws_ec2.cloud_vms
+
+}
+
+
+
+
 

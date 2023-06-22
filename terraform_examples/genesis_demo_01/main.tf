@@ -78,6 +78,18 @@ module "dcloud_cloud_aws_ec2" {
                                 {
                                   name = "genesis-demo-ec2-02", 
                                   type = "t1.micro"
+                                },
+                                {
+                                  name = "genesis-demo-ec2-03", 
+                                  type = "t1.micro"
+                                },
+                                {
+                                  name = "genesis-demo-ec2-04", 
+                                  type = "t1.micro"
+                                },
+                                {
+                                  name = "genesis-demo-ec2-05", 
+                                  type = "t1.micro"
                                 }
                                 ]
 
