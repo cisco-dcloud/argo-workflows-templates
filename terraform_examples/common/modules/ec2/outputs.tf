@@ -1,7 +1,13 @@
 
 
-output "cloud_vms" {
+output "cloud_vms_ips" {
+  value = tomap({
+    for k, i in module.vm_creation : k => i.private_ip
+  })
+}
 
-   value= aws_instance.ec2
-
+output "cloud_vms_arn" {
+  value = tomap({
+    for k, i in module.vm_creation : k => i.arn
+  })
 }

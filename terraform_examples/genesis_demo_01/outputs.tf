@@ -11,12 +11,17 @@ output "onprem_ips" {
 
 }
 
-output "cloud_vms" {
+output "cloud_vms_ips" {
 
-  value = module.dcloud_cloud_aws_ec2.cloud_vms
+  value = module.dcloud_cloud_aws_ec2.cloud_vms_ips
 
 }
 
+output "cloud_vms_arn" {
+
+  value = module.dcloud_cloud_aws_ec2.cloud_vms_ips
+
+}
 
 
 
