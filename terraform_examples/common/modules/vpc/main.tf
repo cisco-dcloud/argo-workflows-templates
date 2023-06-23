@@ -9,7 +9,7 @@ module "vpc" {
   version                          = "4.0.2"
   name                             = "${var.vpc_name}"
   cidr                             = "10.0.0.0/16"
-  azs                              = [data.aws_availability_zones.available.names[1]] #Use second AZ
+  azs                              = [data.aws_availability_zones.available.names[0]] #Use second AZ
   private_subnets                  = ["10.0.11.0/24"]
   public_subnets                   = ["10.0.0.0/24"]
   intra_subnets                    = ["10.0.21.0/24"]
