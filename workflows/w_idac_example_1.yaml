@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: idac-example-
+  annotations:
+    workflows.argoproj.io/description: |
+      This is a simple iDAC example.
+spec:
+  entrypoint: default
+  templates:
+    - name: example_template
+      script:
+        imagePullPolicy: "IfNotPresent"
+        image: docker/whalesay
+        command: ["sh"]
+        source: |
+          echo "This is example workflow: {{workflow.name}}" > /tmp/example.txt
+      outputs:
+        parameters:
+          - name: example_output
+            valueFrom: 
+              path: /tmp/example.txt
+    - name: default
+      dag:
+        tasks:
+          - name: example_task
+            template: example_template
