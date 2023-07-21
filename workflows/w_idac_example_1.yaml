@@ -6,6 +6,16 @@ metadata:
     workflows.argoproj.io/description: |
       This is a simple iDAC example.
 spec:
+  podGC:
+    # Pod GC strategy must be one of the following:
+    # * OnPodCompletion - delete pods immediately when pod is completed (including errors/failures)
+    # * OnPodSuccess - delete pods immediately when pod is successful
+    # * OnWorkflowCompletion - delete pods when workflow is completed
+    # * OnWorkflowSuccess - delete pods when workflow is successful
+    # Default: do not delete pods
+    strategy: OnWorkflowSuccess
+    # The duration before pods in the GC queue get deleted. Defaults to 5s
+    deleteDelayDuration: 30s
   entrypoint: default
   templates:
     - name: example-template
