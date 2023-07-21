@@ -8,7 +8,7 @@ metadata:
 spec:
   entrypoint: default
   templates:
-    - name: example_template
+    - name: example-template
       script:
         imagePullPolicy: "IfNotPresent"
         image: docker/whalesay
@@ -17,11 +17,11 @@ spec:
           echo "This is example workflow: {{workflow.name}}" > /tmp/example.txt
       outputs:
         parameters:
-          - name: example_output
+          - name: example-output
             valueFrom: 
               path: /tmp/example.txt
     - name: default
       dag:
         tasks:
-          - name: example_task
-            template: example_template
+          - name: example-task
+            template: example-template
