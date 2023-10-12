@@ -32,7 +32,8 @@ spec:
       value: ""
     - name: terraform-files-s3-filename
       value: ""     
-
+    - name: terraform-debug-level
+      value: "INFO"   
   templates:
 
     - name: approve
@@ -103,7 +104,7 @@ spec:
                   cd /home/terraform/
                   ls -la
                   pwd
-                  export TF_LOG=DEBUG
+                  export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
                   /bin/terraform init -input=false && /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan && /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
                   exit 1
               - name: terraform-variables-user
@@ -130,5 +131,6 @@ spec:
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
+                  export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
                   /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
                   exit 1
