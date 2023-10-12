@@ -33,7 +33,7 @@ spec:
     - name: terraform-files-s3-filename
       value: ""     
     - name: terraform-debug-level
-      value: "WARN"   #TRACE, DEBUG, INFO, WARN or ERROR 
+      value: "ERROR"   #TRACE, DEBUG, INFO, WARN or ERROR 
   templates:
 
     - name: approve
