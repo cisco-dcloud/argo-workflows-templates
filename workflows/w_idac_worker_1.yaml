@@ -1,0 +1,111 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: argo-idac-worker-
+spec:
+  podGC:
+    # Pod GC strategy must be one of the following:
+    # * OnPodCompletion - delete pods immediately when pod is completed (including errors/failures)
+    # * OnPodSuccess - delete pods immediately when pod is successful
+    # * OnWorkflowCompletion - delete pods when workflow is completed
+    # * OnWorkflowSuccess - delete pods when workflow is successful
+    # Default: do not delete pods
+    strategy: OnPodCompletion
+    # The duration before pods in the GC queue get deleted. Defaults to 5s
+    deleteDelayDuration: 30s
+  entrypoint: main
+  volumes:
+    - hostPath:
+        path: /idac/recipes
+        type: ''
+      name: git-recipes
+    - hostPath:
+        path: /idac/modules-py3
+        type: ''
+      name: git-modules
+    - hostPath:
+        path: /idac/terraform
+        type: ''
+      name: git-terraform
+    - hostPath:
+        path: /idac-external-modules
+        type: ''
+      name: git-modules-github-com
+  serviceAccountName: worker-idac-workers-py3-prodidac
+  arguments:
+    parameters:
+    - name: idac-worker-image
+      value: "devhub-docker.cisco.com/idac-docker-main-docker/idac-workers/idac-worker-py3:23.09.25-75" 
+    - name: idac-worker-locations
+      value: "argo"
+    - name: idac-worker-queue
+      value: "aws.154441876732.us-east-1.eks.prod-01.idac.argo"
+  templates:
+    - name: idacworker          
+      container:
+        imagePullSecrets:
+          - name: devhub-docker.cisco.com
+        restartPolicy: Always
+        env:
+          - name: WRITER_REPLICAS_COUNT
+            value: '4'
+          - name: ENVIRONMENT
+            value: prod
+          - name: LANGUAGE
+            value: python3
+          - name: LOCATION
+            value: "{{workflow.parameters.idac-worker-queue}},{{workflow.parameters.idac-worker-locations}}"
+          - name: GITHUBPULL
+            value: 'false'
+          - name: RABBITSERVER
+            valueFrom:
+              configMapKeyRef:
+                key: RABBITSERVER
+                name: idac
+          - name: RABBITPORT
+            valueFrom:
+              configMapKeyRef:
+                key: RABBITPORT
+                name: idac
+          - name: RABBITSSL
+            valueFrom:
+              configMapKeyRef:
+                key: RABBITSSL
+                name: idac
+          - name: LOGTORABBIT
+            value: 'false'
+          - name: LOGTOFILE
+            value: 'false'
+          - name: WORKERVPNMODE
+            value: 'true'
+          - name: RABBITUSER
+            valueFrom:
+              secretKeyRef:
+                key: RABBITUSER
+                name: idac
+          - name: RABBITPASSWORD
+            valueFrom:
+              secretKeyRef:
+                key: RABBITPASSWORD
+                name: idac
+        image: "{{workflow.parameters.idac-worker-image}}"
+        imagePullPolicy: IfNotPresent
+        name: argo-idac-workers-py3
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - mountPath: /root/recipes/
+            name: git-recipes
+          - mountPath: /root/modules/
+            name: git-modules
+          - mountPath: /root/terraform/
+            name: git-terraform
+          - mountPath: /root/modules-github-com/
+            name: git-modules-github-com
+        command: ["sh"]
+      outputs:
+    - name: main
+      dag:
+        tasks:
+          - name: worker
+            template: idacworker
