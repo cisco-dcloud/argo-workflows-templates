@@ -89,6 +89,8 @@ spec:
                 key: RABBITPASSWORD
                 name: idac
         image: "{{workflow.parameters.idac-worker-image}}"
+        command: ["/bin/bash"]
+        args: ["/root/starter.sh"]
         imagePullPolicy: IfNotPresent
         name: argo-idac-workers-py3
         securityContext:
