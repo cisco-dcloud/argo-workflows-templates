@@ -51,6 +51,8 @@ spec:
             value: '4'
           - name: ENVIRONMENT
             value: prod
+          - name: RELOADPOLICY
+            value: '1'
           - name: LANGUAGE
             value: python3
           - name: LOCATION
