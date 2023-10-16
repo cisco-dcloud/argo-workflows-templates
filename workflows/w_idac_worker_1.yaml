@@ -35,7 +35,7 @@ spec:
   arguments:
     parameters:
     - name: idac-worker-image
-      value: "devhub-docker.cisco.com/idac-docker-main-docker/idac-workers/idac-worker-py3:23.09.25-75" 
+      value: "devhub-docker.cisco.com/idac-docker-main-docker/idac-workers/idac-worker-py3:23.10.14-76" 
     - name: idac-worker-locations
       value: "argo"
     - name: idac-worker-queue
