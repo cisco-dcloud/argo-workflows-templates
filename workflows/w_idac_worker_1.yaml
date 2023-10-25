@@ -12,7 +12,7 @@ spec:
     # Default: do not delete pods
     strategy: OnPodCompletion
     # The duration before pods in the GC queue get deleted. Defaults to 5s
-    deleteDelayDuration: 30s
+    deleteDelayDuration: 3600s
   entrypoint: main
   volumes:
     - hostPath:

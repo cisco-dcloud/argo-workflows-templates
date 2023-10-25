@@ -10,9 +10,9 @@ spec:
     # * OnWorkflowCompletion - delete pods when workflow is completed
     # * OnWorkflowSuccess - delete pods when workflow is successful
     # Default: do not delete pods
-    strategy: OnWorkflowSuccess
+    strategy: OnPodCompletion
     # The duration before pods in the GC queue get deleted. Defaults to 5s
-    deleteDelayDuration: 30s
+    deleteDelayDuration: 86400s
 
   entrypoint: main
   serviceAccountName: "argo-workflow"
