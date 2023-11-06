@@ -34,6 +34,12 @@ spec:
       value: ""     
     - name: terraform-debug-level
       value: "ERROR"   #TRACE, DEBUG, INFO, WARN or ERROR 
+    - name: tf-pod-label-idac-request
+      value: "unknown"     
+    - name: tf-pod-label-idac-recipe
+      value: "unknown"    
+    - name: tf-pod-label-idac-owner
+      value: "unknown"    
   templates:
 
     - name: approve
@@ -47,7 +53,11 @@ spec:
         parameters:
         - name: terraform-commands
           value: ""
-          
+      metadata:
+        labels:
+          idac_request: "{{workflow.parameters.tf-pod-label-idac-request}}"
+          idac_recipe: "{{workflow.parameters.tf-pod-label-idac-recipe}}"
+          idac_owner: "{{workflow.parameters.tf-pod-label-idac-owner}}"
       script:
         imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
