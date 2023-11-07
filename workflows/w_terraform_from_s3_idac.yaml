@@ -14,6 +14,13 @@ spec:
     # The duration before pods in the GC queue get deleted. Defaults to 5s
     deleteDelayDuration: 86400s
 
+  ttlStrategy:
+    #The TTLStrategy sets the strategy for how long workflows that are
+    # successful, not successful, or completed should live.
+    secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
+    secondsAfterSuccess: 5     # Time to live after workflow is successful
+    secondsAfterFailure: 86400     # Time to live after workflow fails
+
   entrypoint: main
   serviceAccountName: "argo-workflow"
   arguments:
