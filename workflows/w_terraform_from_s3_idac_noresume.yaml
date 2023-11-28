@@ -93,7 +93,7 @@ spec:
       steps:
         - - name: init-plan-apply
             template: terraformscript
-            when: "{{workflow.parameters.action}} == 'apply'"
+            when: "{{workflow.parameters.terraform-action}} == 'apply'"
             arguments:
               artifacts:
               - name: terraform-folder
@@ -120,7 +120,7 @@ spec:
                 value: "{{workflow.parameters.terraform-variables-admin}}"
         - - name: destroy
             template: terraformscript
-            when: "{{workflow.parameters.action}} == 'destroy'"
+            when: "{{workflow.parameters.terraform-action}} == 'destroy'"
             arguments:
               artifacts:
               - name: terraform-folder
