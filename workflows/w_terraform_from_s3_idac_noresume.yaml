@@ -33,7 +33,7 @@ spec:
     - name: terraform-parallelism
       value: "2"      
     - name: terraform-debug-level
-      value: "ERROR"                          #TRACE, DEBUG, INFO, WARN or ERROR 
+      value: "INFO"                          #TRACE, DEBUG, INFO, WARN or ERROR 
     - name: terraform-action
       value: "apply"                          #apply, destroy 
     - name: artifact-gc-policy
@@ -137,5 +137,6 @@ spec:
                   chmod 644 .terraform.lock.hcl
                   chmod -R 755 .terraform
                   export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
+                  export TF_LOG_PATH="/home/terraform/tf_{{workflow.parameters.terraform-action}}.log"
                   /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
                   exit 1
