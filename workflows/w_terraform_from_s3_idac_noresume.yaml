@@ -84,10 +84,10 @@ spec:
             archive:
               none: {}
             globalName: terraform-state
-            endpoint: s3.amazonaws.com
-            bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
-            key: "{{workflow.parameters.terraform-files-s3-key}}"
-
+            s3:
+              endpoint: s3.amazonaws.com
+              bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
+              key: "{{workflow.parameters.terraform-files-s3-key}}"
 
     - name: main
       steps:
