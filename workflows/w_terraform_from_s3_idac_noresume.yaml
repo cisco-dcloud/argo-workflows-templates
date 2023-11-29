@@ -33,7 +33,7 @@ spec:
     - name: terraform-parallelism
       value: "2"      
     - name: terraform-debug-level
-      value: "INFO"                          #TRACE, DEBUG, INFO, WARN or ERROR 
+      value: "ERROR"                          #TRACE, DEBUG, INFO, WARN or ERROR 
     - name: terraform-action
       value: "apply"                          #apply, destroy 
     - name: artifact-gc-policy
