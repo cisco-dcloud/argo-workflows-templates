@@ -92,8 +92,9 @@ spec:
               serviceAccountName: "argo-workflows"
     - name: main
       steps:
-        - - name: "{{workflow.parameters.terraform-action}}"
+        - - name: init-plan-apply
             template: terraformscript
+            when: "{{workflow.parameters.terraform-action}} == 'apply'"
             arguments:
               artifacts:
               - name: terraform-folder
@@ -104,10 +105,6 @@ spec:
               parameters:
               - name: terraform-commands
                 value: |
-                  action="{{workflow.parameters.terraform-action}}"
-
-                  if [ "$action" = "apply" ]; then
-                  echo "Executing apply..."
                   cat <<-EOF > /home/terraform/terraform_user.tfvars
                   {{workflow.parameters.terraform-variables-user}}
                   EOF
@@ -119,10 +116,23 @@ spec:
                   export TF_LOG_PATH="/home/terraform/tf_{{workflow.parameters.terraform-action}}.log"
                   /bin/terraform init -input=false && /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan && /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
                   exit 1
-                  fi
-
-                  if [ "$action" = "destroy" ]; then
-                  echo "Executing destroy..."              
+              - name: terraform-variables-user
+                value: "{{workflow.parameters.terraform-variables-user}}"
+              - name: terraform-variables-admin
+                value: "{{workflow.parameters.terraform-variables-admin}}"
+        - - name: destroy
+            template: terraformscript
+            when: "{{workflow.parameters.terraform-action}} == 'destroy'"
+            arguments:
+              artifacts:
+              - name: terraform-folder
+                s3:
+                  endpoint: s3.amazonaws.com
+                  bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
+                  key: "{{workflow.parameters.terraform-files-s3-key}}"
+              parameters:
+              - name: terraform-commands
+                value: |
                   cd /home/terraform/
                   chmod 644 *.tf
                   chmod 644 .terraform.lock.hcl
@@ -131,8 +141,3 @@ spec:
                   export TF_LOG_PATH="/home/terraform/tf_{{workflow.parameters.terraform-action}}.log"
                   /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
                   exit 1
-                  fi
-              - name: terraform-variables-user
-                value: "{{workflow.parameters.terraform-variables-user}}"
-              - name: terraform-variables-admin
-                value: "{{workflow.parameters.terraform-variables-admin}}"
