@@ -22,10 +22,9 @@ spec:
     secondsAfterFailure: 86400   # Time to live after workflow fails
   entrypoint: main
   serviceAccountName: "argo-workflow"
-  artifactGC:
-    strategy: "OnWorkflowDeletion"
-    serviceAccountName: "argo-workflows"
-    forceFinalizerRemoval: true
+  # artifactGC:
+  #   strategy: "OnWorkflowCompletion"
+  #   serviceAccountName: "argo-workflows"
 
   arguments:
     parameters:
@@ -41,8 +40,8 @@ spec:
       value: "ERROR"                          #TRACE, DEBUG, INFO, WARN or ERROR 
     - name: terraform-action
       value: "apply"                          #apply, destroy 
-    - name: artifact-gc-policy
-      value: "OnWorkflowDeletion"             #Never, OnWorkflowDeletion, OnWorkflowCompletion 
+    # - name: artifact-gc-policy
+    #   value: "OnWorkflowCompletion"             #Never, OnWorkflowDeletion, OnWorkflowCompletion 
     - name: terraform-files-s3-bucket
     - name: terraform-files-s3-key
 
@@ -92,8 +91,8 @@ spec:
               none: {}
             s3:
               key: "{{workflow.parameters.terraform-files-s3-key}}"
-            artifactGC:
-              strategy: "{{workflow.parameters.artifact-gc-policy}}"
+            # artifactGC:
+            #   strategy: "{{workflow.parameters.artifact-gc-policy}}"
               # serviceAccountName: "argo-workflows"
               # forceFinalizerRemoval: true
 
