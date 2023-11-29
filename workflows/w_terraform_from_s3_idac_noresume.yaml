@@ -17,8 +17,8 @@ spec:
   ttlStrategy:
     #The TTLStrategy sets the strategy for how long workflows that are
     # successful, not successful, or completed should live.
-    secondsAfterCompletion: 3600  # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
-    secondsAfterSuccess: 3600     # Time to live after workflow is successful
+    secondsAfterCompletion: 60  # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
+    secondsAfterSuccess: 60     # Time to live after workflow is successful
     secondsAfterFailure: 86400   # Time to live after workflow fails
   entrypoint: main
   serviceAccountName: "argo-workflow"
