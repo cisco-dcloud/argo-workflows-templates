@@ -22,6 +22,11 @@ spec:
     secondsAfterFailure: 86400   # Time to live after workflow fails
   entrypoint: main
   serviceAccountName: "argo-workflow"
+  artifactGC:
+    strategy: "OnWorkflowDeletion"
+    serviceAccountName: "argo-workflows"
+    forceFinalizerRemoval: true
+
   arguments:
     parameters:
     - name: terraform-docker-image
@@ -89,7 +94,8 @@ spec:
               key: "{{workflow.parameters.terraform-files-s3-key}}"
             artifactGC:
               strategy: "{{workflow.parameters.artifact-gc-policy}}"
-              serviceAccountName: "argo-workflows"
+              # serviceAccountName: "argo-workflows"
+              # forceFinalizerRemoval: true
 
     - name: main
       dag:
