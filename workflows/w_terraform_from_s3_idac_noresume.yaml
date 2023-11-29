@@ -89,6 +89,7 @@ spec:
               key: "{{workflow.parameters.terraform-files-s3-key}}"
             artifactGC:
               strategy: "{{workflow.parameters.artifact-gc-policy}}"
+              serviceAccountName: "argo-workflow"
     - name: main
       steps:
         - - name: init-plan-apply
