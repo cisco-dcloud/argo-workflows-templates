@@ -126,7 +126,7 @@ spec:
 
           - name: "k8s-create-secret"
             template: k8ssecret
-            when: "'{{workflow.parameters.aws-secret-name}}' != 'aws-credentials'"
+            when: "{{=workflow.parameters['aws-secret-name'] != 'aws-credentials'}}"
             arguments:
               parameters:
               - name: k8s-commands
@@ -181,7 +181,7 @@ spec:
           - name: "k8s-delete-secret"
             template: k8ssecret
             dependencies: ["tf-{{workflow.parameters.terraform-action}}"]
-            when: "'{{workflow.parameters.aws-secret-name}}' != 'aws-credentials'"
+            when: "{{=workflow.parameters['aws-secret-name'] == 'aws-credentials'}}"
             arguments:
               parameters:
               - name: k8s-commands
