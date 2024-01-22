@@ -133,7 +133,7 @@ spec:
                   touch /tmp/nodes_outputs.json
                   curl -v >> /tmp/nodes_outputs.json
                   kubectl create secret generic {{workflow.parameters.aws-secret-name}}-{{workflow.name}}  --from-literal=AWS_ACCESS_KEY_ID=supersecret --from-literal=AWS_SECRET_ACCESS_KEY=supersecret --from-literal=AWS_DEFAULT_REGION=supersecret -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
-                  kubectl get secret generic {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
+                  kubectl get secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
 
           - name: "tf-{{workflow.parameters.terraform-action}}"
             template: terraformscript
@@ -191,6 +191,6 @@ spec:
                 value: |
                   touch /tmp/nodes_outputs.json
                   curl -v >> /tmp/nodes_outputs.json
-                  kubectl get secret generic {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
+                  kubectl get secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
                   kubectl delete secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
 
