@@ -61,12 +61,10 @@ spec:
         imagePullPolicy: "IfNotPresent"
         image: bitnami/kubectl
         command: ["sh"]
-        source: |
-          env > /tmp/nodes_outputs.json
-          kubectl get secrets -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
+        source: "{{inputs.parameters.k8s-commands}}"
       outputs:
         parameters:
-          - name: nodes
+          - name: output
             valueFrom: 
               path: /tmp/nodes_outputs.json
 
@@ -127,11 +125,13 @@ spec:
 
           - name: "k8s-create-secret"
             template: k8ssecret
-            when: "{{=workflow.parameters['aws-secret-name'] != 'aws-credentials'}}"
+            when: "{{=workflow.parameters['aws-secret-name'] == 'aws-credentials'}}"
             arguments:
               parameters:
               - name: k8s-commands
-                value: ""
+                value: |
+                  curl -v
+                  kubectl create secret generic {{workflow.parameters.aws-secret-name}}-{{workflow.name}}  --from-literal=AWS_ACCESS_KEY_ID=supersecret --from-literal=AWS_SECRET_ACCESS_KEY=supersecret --from-literal=AWS_DEFAULT_REGION=supersecret -n idac-kitchen-deployments
 
           - name: "tf-{{workflow.parameters.terraform-action}}"
             template: terraformscript
@@ -186,5 +186,8 @@ spec:
             arguments:
               parameters:
               - name: k8s-commands
-                value: ""
+                value: |
+                  curl -v
+                  kubectl get secret generic {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments
+                  kubectl delete secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments
 
