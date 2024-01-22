@@ -62,7 +62,8 @@ spec:
         image: bitnami/kubectl
         command: ["sh"]
         source: |
-          kubectl get nodes > /tmp/nodes_outputs.json
+          env > /tmp/nodes_outputs.json
+          kubectl get secrets -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
       outputs:
         parameters:
           - name: nodes
