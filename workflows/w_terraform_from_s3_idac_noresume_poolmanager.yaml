@@ -48,7 +48,7 @@ spec:
     - name: pool-manager-resource-id
 
   templates:
-    - name: kubect_curl_jq_scripts
+    - name: kubect-curl-jq-scripts
       inputs:
         parameters:
         - name: commands
@@ -122,7 +122,7 @@ spec:
       dag:
         tasks:     
           - name: "k8s-create-secret"
-            template: kubect_curl_jq_scripts
+            template: kubect-curl-jq-scripts
             when: "{{=workflow.parameters['aws-secret-name'] == 'aws-credentials'}}"
             arguments:
               parameters:
@@ -182,7 +182,7 @@ spec:
                 value: "{{workflow.parameters.terraform-variables-admin}}"
 
           - name: "k8s-delete-secret"
-            template: kubect_curl_jq_scripts
+            template: kubect-curl-jq-scripts
             dependencies: ["tf-{{workflow.parameters.terraform-action}}"]
             when: "{{=workflow.parameters['aws-secret-name'] == 'aws-credentials'}}"
             arguments:
