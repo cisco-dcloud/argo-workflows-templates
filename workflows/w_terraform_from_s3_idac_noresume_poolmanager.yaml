@@ -40,35 +40,38 @@ spec:
       value: "ERROR"                          #TRACE, DEBUG, INFO, WARN or ERROR 
     - name: terraform-action
       value: "apply"                          #apply, destroy 
-    # - name: artifact-gc-policy
-    #   value: "OnWorkflowCompletion"             #Never, OnWorkflowDeletion, OnWorkflowCompletion 
     - name: terraform-files-s3-bucket
     - name: terraform-files-s3-key
     - name: aws-secret-name
       value: "aws-credentials"
+    - name: pool-manager-reservation-id
+    - name: pool-manager-resource-id
 
   templates:
-
-    - name: k8ssecret
+    - name: kubect_curl_jq_scripts
       inputs:
         parameters:
-        - name: k8s-commands
+        - name: commands
           value: ""
       metadata:
         labels:
           idac_request: "{{workflow.labels.idac_request}}"   #The workflow label is appended by iDAC 
       script:
         imagePullPolicy: "IfNotPresent"
-        image: bitnami/kubectl
+        image: saagie/curl-jq-helm-kubectl:2311020942_1.25.12
         command: ["sh"]
-        source: "{{inputs.parameters.k8s-commands}}"
+        source: "{{inputs.parameters.commands}}"
+        env:
+        - name: POOLMANAGER_TOKEN    
+          valueFrom:
+            secretKeyRef:
+              name: "{{=workflow.namespace == 'idac' ? 'idac' : 'kitchen' }}" 
+              key: POOLMANAGER_TOKEN         
       outputs:
         parameters:
           - name: output
             valueFrom: 
-              path: /tmp/nodes_outputs.json
-
-
+              path: /tmp/outputs.logs
     - name: terraformscript
       inputs:
         artifacts:
@@ -114,26 +117,23 @@ spec:
               none: {}
             s3:
               key: "{{workflow.parameters.terraform-files-s3-key}}"
-            # artifactGC:
-            #   strategy: "{{workflow.parameters.artifact-gc-policy}}"
-              # serviceAccountName: "argo-workflows"
-              # forceFinalizerRemoval: true
 
     - name: main
       dag:
-        tasks:        
-
+        tasks:     
           - name: "k8s-create-secret"
-            template: k8ssecret
+            template: kubect_curl_jq_scripts
             when: "{{=workflow.parameters['aws-secret-name'] == 'aws-credentials'}}"
             arguments:
               parameters:
-              - name: k8s-commands
+              - name: commands
                 value: |
-                  touch /tmp/nodes_outputs.json
-                  curl -v >> /tmp/nodes_outputs.json
-                  kubectl create secret generic {{workflow.parameters.aws-secret-name}}-{{workflow.name}}  --from-literal=AWS_ACCESS_KEY_ID=supersecret --from-literal=AWS_SECRET_ACCESS_KEY=supersecret --from-literal=AWS_DEFAULT_REGION=supersecret -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
-                  kubectl get secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
+                  kubectl create secret generic {{workflow.parameters.aws-secret-name}}-{{workflow.name}}  \
+                    --from-literal=AWS_ACCESS_KEY_ID=$(curl -vvv -H 'accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $POOLMANAGER_TOKEN' -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.key) \
+                    --from-literal=AWS_SECRET_ACCESS_KEY=$(curl -vvv -H 'accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $POOLMANAGER_TOKEN' -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.secret) \
+                    --from-literal=AWS_DEFAULT_REGION=$(curl -vvv -H 'accept: application/json' -H 'Content-Type: application/json' -H 'Authorization: Bearer $POOLMANAGER_TOKEN' -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.region) \
+                    -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
+                  exit $?
 
           - name: "tf-{{workflow.parameters.terraform-action}}"
             template: terraformscript
@@ -182,15 +182,16 @@ spec:
                 value: "{{workflow.parameters.terraform-variables-admin}}"
 
           - name: "k8s-delete-secret"
-            template: k8ssecret
+            template: kubect_curl_jq_scripts
             dependencies: ["tf-{{workflow.parameters.terraform-action}}"]
             when: "{{=workflow.parameters['aws-secret-name'] == 'aws-credentials'}}"
             arguments:
               parameters:
-              - name: k8s-commands
+              - name: commands
                 value: |
-                  touch /tmp/nodes_outputs.json
-                  curl -v >> /tmp/nodes_outputs.json
-                  kubectl get secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
-                  kubectl delete secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} -n idac-kitchen-deployments >> /tmp/nodes_outputs.json
+                  kubectl get secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} \
+                    -o=json \
+                    -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
+                  kubectl delete secret {{workflow.parameters.aws-secret-name}}-{{workflow.name}} \
+                    -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
 
