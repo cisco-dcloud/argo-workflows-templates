@@ -141,7 +141,7 @@ spec:
                     -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
                   exit $?
 
-          - name: "tf-{{workflow.parameters.terraform-action}}"
+          - name: "terraform"
             template: terraformscript
             dependencies: ["k8s-create-secret"]
             arguments:
@@ -189,7 +189,7 @@ spec:
 
           - name: "k8s-delete-secret"
             template: kubect-curl-jq-scripts
-            dependencies: ["tf-{{workflow.parameters.terraform-action}}"]
+            depends: "terraform.Succeeded || terraform.Failed"
             when: "{{=workflow.parameters['aws-secret-name'] == 'PM'}}"
             arguments:
               parameters:
