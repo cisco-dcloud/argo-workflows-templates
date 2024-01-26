@@ -143,7 +143,7 @@ spec:
 
           - name: "terraform"
             template: terraformscript
-            dependencies: ["k8s-create-secret"]
+            depends: "k8s-create-secret"
             arguments:
               artifacts:
               - name: terraform-folder
@@ -189,7 +189,7 @@ spec:
 
           - name: "k8s-delete-secret"
             template: kubect-curl-jq-scripts
-            depends: "terraform.Succeeded || terraform.Failed"
+            depends: "terraform.Succeeded || terraform.Failed || terraform.Skipped"
             when: "{{=workflow.parameters['aws-secret-name'] == 'PM'}}"
             arguments:
               parameters:
