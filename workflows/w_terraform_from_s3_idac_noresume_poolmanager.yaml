@@ -43,7 +43,7 @@ spec:
     - name: terraform-files-s3-bucket
     - name: terraform-files-s3-key
     - name: aws-secret-name
-      value: "PM"                             #DCE: static secret  "aws-credentials",  PM: ephimeral secret  pm-aws-{{workflow.name}}
+      value: "PM"                             #DCE: static secret  "aws-credentials",  PM: ephimeral secret  {{workflow.name}}
     - name: pool-manager-reservation-id
     - name: pool-manager-resource-id
 
@@ -92,17 +92,17 @@ spec:
         - name: AWS_ACCESS_KEY_ID      # name of env var
           valueFrom:
             secretKeyRef:
-              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? pm-aws-{{workflow.name}} : 'aws-credentials' }}"           
+              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"           
               key: AWS_ACCESS_KEY_ID
         - name: AWS_SECRET_ACCESS_KEY  
           valueFrom:
             secretKeyRef:
-              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? pm-aws-{{workflow.name}} : 'aws-credentials' }}"
+              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"
               key: AWS_SECRET_ACCESS_KEY    
         - name: AWS_DEFAULT_REGION  
           valueFrom:
             secretKeyRef:
-              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? pm-aws-{{workflow.name}} : 'aws-credentials' }}"
+              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"
               key: AWS_DEFAULT_REGION 
       outputs:
         parameters:
@@ -134,7 +134,7 @@ spec:
                   result=$(curl -vvv -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource)
                   echo "POOLMANAGER_RESOURCE: $result" >> /tmp/outputs.logs
 
-                  kubectl create secret generic pm-aws-{{workflow.name}}  \
+                  kubectl create secret generic {{workflow.name}}  \
                     --from-literal=AWS_ACCESS_KEY_ID=$(curl -vvv -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.key) \
                     --from-literal=AWS_SECRET_ACCESS_KEY=$(curl -vvv -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.secret) \
                     --from-literal=AWS_DEFAULT_REGION=$(curl -vvv -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.region) \
@@ -195,9 +195,9 @@ spec:
               parameters:
               - name: commands
                 value: |
-                  kubectl get secret pm-aws-{{workflow.name}} \
+                  kubectl get secret {{workflow.name}} \
                     -o=json \
                     -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
-                  kubectl delete secret pm-aws-{{workflow.name}} \
+                  kubectl delete secret {{workflow.name}} \
                     -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
 
