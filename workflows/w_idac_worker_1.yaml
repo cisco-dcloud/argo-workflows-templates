@@ -112,6 +112,11 @@ spec:
             name: git-terraform
           - mountPath: /root/modules-github-com/
             name: git-modules-github-com
+      tolerations:
+        - key: "dedicated"
+          operator: "Equal"
+          value: "prod"
+          effect: "NoSchedule"
       outputs:
     - name: main
       dag:
