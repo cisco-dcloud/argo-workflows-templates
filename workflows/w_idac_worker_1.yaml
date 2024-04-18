@@ -46,6 +46,11 @@ spec:
       value: "argo"
     - name: idac-worker-queue
       value: "aws.154441876732.us-east-1.eks.prod-01.idac.argo"
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "prod"
+      effect: "NoSchedule"
   templates:
     - name: idacworker          
       container:
@@ -112,11 +117,6 @@ spec:
             name: git-terraform
           - mountPath: /root/modules-github-com/
             name: git-modules-github-com
-      tolerations:
-        - key: "dedicated"
-          operator: "Equal"
-          value: "prod"
-          effect: "NoSchedule"
       outputs:
     - name: main
       dag:
