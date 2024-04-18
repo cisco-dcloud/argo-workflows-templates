@@ -46,6 +46,8 @@ spec:
       value: "argo"
     - name: idac-worker-queue
       value: "aws.154441876732.us-east-1.eks.prod-01.idac.argo"
+  nodeSelector: 
+    idac.cat-dcloud.com/nodegroup-name: prod
   tolerations:
     - key: "dedicated"
       operator: "Equal"
