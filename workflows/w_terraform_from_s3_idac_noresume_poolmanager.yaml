@@ -47,6 +47,14 @@ spec:
     - name: pool-manager-reservation-id
     - name: pool-manager-resource-id
 
+  nodeSelector: 
+    idac.cat-dcloud.com/nodegroup-name: prod
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "prod"
+      effect: "NoSchedule"
+
   templates:
     - name: kubect-curl-jq-scripts
       inputs:

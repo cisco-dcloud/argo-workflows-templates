@@ -45,6 +45,15 @@ spec:
     - name: terraform-files-s3-bucket
     - name: terraform-files-s3-key
 
+  nodeSelector: 
+    idac.cat-dcloud.com/nodegroup-name: prod
+  tolerations:
+    - key: "dedicated"
+      operator: "Equal"
+      value: "prod"
+      effect: "NoSchedule"
+
+
   templates:
     - name: terraformscript
       inputs:
