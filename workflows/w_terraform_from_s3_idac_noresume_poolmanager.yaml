@@ -3,16 +3,16 @@ kind: Workflow
 metadata:
   generateName: idac-tf-
 spec:
-  # podGC:
-  #   # Pod GC strategy must be one of the following:
-  #   # * OnPodCompletion - delete pods immediately when pod is completed (including errors/failures)
-  #   # * OnPodSuccess - delete pods immediately when pod is successful
-  #   # * OnWorkflowCompletion - delete pods when workflow is completed
-  #   # * OnWorkflowSuccess - delete pods when workflow is successful
-  #   # Default: do not delete pods
-  #   strategy: OnPodCompletion
-  #   # The duration before pods in the GC queue get deleted. Defaults to 5s
-  #   deleteDelayDuration: 86400s
+  podGC:
+    # Pod GC strategy must be one of the following:
+    # * OnPodCompletion - delete pods immediately when pod is completed (including errors/failures)
+    # * OnPodSuccess - delete pods immediately when pod is successful
+    # * OnWorkflowCompletion - delete pods when workflow is completed
+    # * OnWorkflowSuccess - delete pods when workflow is successful
+    # Default: do not delete pods
+    strategy: OnPodCompletion
+    # The duration before pods in the GC queue get deleted. Defaults to 5s
+    deleteDelayDuration: 86400s
 
   ttlStrategy:
     #The TTLStrategy sets the strategy for how long workflows that are
@@ -125,7 +125,6 @@ spec:
               none: {}
             s3:
               key: "{{workflow.parameters.terraform-files-s3-key}}"
-
     - name: main
       dag:
         tasks:     
@@ -142,6 +141,14 @@ spec:
                   result=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource)
                   echo "POOLMANAGER_RESOURCE: $result" >> /tmp/outputs.logs
 
+                  curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource
+                  download=$?
+                  if [ $download -ne 0 ]; then
+                      # Command 2 will only run if command1 failed
+                      echo "Failed to download the secret from poolmanager" >> /tmp/outputs.logs
+                      exit $download
+                  fi
+
                   kubectl create secret generic {{workflow.name}}  \
                     --from-literal=AWS_ACCESS_KEY_ID=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.accessKeyId) \
                     --from-literal=AWS_SECRET_ACCESS_KEY=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource | jq -r  .attributes.secretKey) \
@@ -151,7 +158,7 @@ spec:
 
           - name: "terraform"
             template: terraformscript
-            depends: "k8s-create-secret"
+            depends: "k8s-create-secret.Succeeded"
             arguments:
               artifacts:
               - name: terraform-folder
@@ -197,7 +204,7 @@ spec:
 
           - name: "k8s-delete-secret"
             template: kubect-curl-jq-scripts
-            depends: "terraform.Succeeded || terraform.Failed || terraform.Skipped"
+            depends: "k8s-create-secret.Succeeded && terraform"
             when: "{{=workflow.parameters['aws-secret-name'] == 'PM'}}"
             arguments:
               parameters:
