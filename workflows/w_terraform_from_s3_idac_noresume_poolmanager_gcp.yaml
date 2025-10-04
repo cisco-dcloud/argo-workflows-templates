@@ -152,7 +152,7 @@ spec:
               - name: terraform-commands
                 value: |
                   cat <<-EOF > /tmp/service-account-key.json
-                  {{workflow.parameters.gcp-creds}}
+                  {{tasks.get-creds-from-pm.outputs.parameters.gcp-creds}}
                   EOF
                   action="{{workflow.parameters.terraform-action}}"
 
