@@ -127,13 +127,13 @@ spec:
                   echo "POOLMANAGER_TOKEN: $POOLMANAGER_TOKEN" >> /tmp/outputs.logs
                   echo "POOLMANAGER_RESERVATION_ID: {{workflow.parameters.pool-manager-reservation-id}}" >> /tmp/outputs.logs
                   echo "POOLMANAGER_RESOURCE_ID: {{workflow.parameters.pool-manager-resource-id}}" >> /tmp/outputs.logs
-                  curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource > pm-response.json
+                  curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2.apps:8080/api/v2/resource > /tmp/pm-response.json
                   download=$?
                   if [ $download -ne 0 ]; then
                       echo "Failed to download the secret from poolmanager" >> /tmp/outputs.logs
                       exit $download
                   fi
-                  cat pm-response.json | jq -r  .attributes.credentials > /tmp/service-account-key.json
+                  cat /tmp/pm-response.json | jq -r  .attributes.credentials > /tmp/service-account-key.json
                   exit $?
 
           - name: "terraform"
