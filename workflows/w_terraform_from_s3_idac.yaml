@@ -18,70 +18,69 @@ spec:
     #The TTLStrategy sets the strategy for how long workflows that are
     # successful, not successful, or completed should live.
     secondsAfterCompletion: 10 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
-    secondsAfterSuccess: 5     # Time to live after workflow is successful
-    secondsAfterFailure: 86400     # Time to live after workflow fails
+    secondsAfterSuccess: 5 # Time to live after workflow is successful
+    secondsAfterFailure: 86400 # Time to live after workflow fails
 
   entrypoint: main
   serviceAccountName: "argo-workflow"
   arguments:
     parameters:
-    - name: terraform-docker-image
-      value: "hashicorp/terraform:1.4" 
-    - name: terraform-variables-user
-      value: ""  
-    - name: terraform-variables-admin
-      value: ""   
-    - name: terraform-parallelism
-      value: "2"      
-    - name: terraform-files-s3-bucket
-      value: ""
-    - name: terraform-files-s3-key
-      value: ""
-    - name: terraform-files-s3-filename
-      value: ""     
-    - name: terraform-debug-level
-      value: "ERROR"   #TRACE, DEBUG, INFO, WARN or ERROR 
+      - name: terraform-docker-image
+        value: "ghcr.io/cisco-dcloud/terraform/terraform-runner:latest"
+      - name: terraform-variables-user
+        value: ""
+      - name: terraform-variables-admin
+        value: ""
+      - name: terraform-parallelism
+        value: "2"
+      - name: terraform-files-s3-bucket
+        value: ""
+      - name: terraform-files-s3-key
+        value: ""
+      - name: terraform-files-s3-filename
+        value: ""
+      - name: terraform-debug-level
+        value: "ERROR" #TRACE, DEBUG, INFO, WARN or ERROR
   templates:
-
     - name: approve
       suspend: {}
 
     - name: terraformscript
       inputs:
         artifacts:
-        - name: terraform-folder
-          path: /home/terraform
+          - name: terraform-folder
+            path: /home/terraform
         parameters:
-        - name: terraform-commands
-          value: ""
+          - name: terraform-commands
+            value: ""
       metadata:
         labels:
-          idac_request: "{{workflow.labels.idac_request}}"   #The workflow label is appended by iDAC 
+          idac_request: "{{workflow.labels.idac_request}}" #The workflow label is appended by iDAC
       script:
         imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
-        source: "{{inputs.parameters.terraform-commands}}" 
+        source: "{{inputs.parameters.terraform-commands}}"
         env:
-        - name: AWS_ACCESS_KEY_ID      # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: aws-credentials           # name of k8s secret
-              key: AWS_ACCESS_KEY_ID          # 'key' subcomponent of the secret
-        - name: AWS_SECRET_ACCESS_KEY  
-          valueFrom:
-            secretKeyRef:
-              name: aws-credentials
-              key: AWS_SECRET_ACCESS_KEY    
-        - name: AWS_DEFAULT_REGION  
-          valueFrom:
-            secretKeyRef:
-              name: aws-credentials
-              key: AWS_DEFAULT_REGION 
+          - name: AWS_ACCESS_KEY_ID # name of env var
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials # name of k8s secret
+                key: AWS_ACCESS_KEY_ID # 'key' subcomponent of the secret
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: AWS_SECRET_ACCESS_KEY
+          - name: AWS_DEFAULT_REGION
+            valueFrom:
+              secretKeyRef:
+                name: aws-credentials
+                key: AWS_DEFAULT_REGION
       outputs:
         parameters:
           - name: terraform-outputs
-            valueFrom: 
+            valueFrom:
               path: /tmp/tf_outputs.json
         artifacts:
           - name: terraform-folder
@@ -96,30 +95,30 @@ spec:
             template: terraformscript
             arguments:
               artifacts:
-              - name: terraform-folder
-                s3:
-                  endpoint: s3.amazonaws.com
-                  bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
-                  key: "{{workflow.parameters.terraform-files-s3-key}}"
+                - name: terraform-folder
+                  s3:
+                    endpoint: s3.amazonaws.com
+                    bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
+                    key: "{{workflow.parameters.terraform-files-s3-key}}"
               parameters:
-              - name: terraform-commands
-                value: |
-                  cat <<-EOF > /home/terraform/terraform_user.tfvars
-                  {{workflow.parameters.terraform-variables-user}}
-                  EOF
-                  cat <<-EOF > /home/terraform/terraform_admin.tfvars
-                  {{workflow.parameters.terraform-variables-admin}}
-                  EOF
-                  cd /home/terraform/
-                  ls -la
-                  pwd
-                  export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
-                  /bin/terraform init -input=false && /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan && /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
-                  exit 1
-              - name: terraform-variables-user
-                value: "{{workflow.parameters.terraform-variables-user}}"
-              - name: terraform-variables-admin
-                value: "{{workflow.parameters.terraform-variables-admin}}"
+                - name: terraform-commands
+                  value: |
+                    cat <<-EOF > /home/terraform/terraform_user.tfvars
+                    {{workflow.parameters.terraform-variables-user}}
+                    EOF
+                    cat <<-EOF > /home/terraform/terraform_admin.tfvars
+                    {{workflow.parameters.terraform-variables-admin}}
+                    EOF
+                    cd /home/terraform/
+                    ls -la
+                    pwd
+                    export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
+                    /bin/terraform init -input=false && /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan && /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
+                    exit 1
+                - name: terraform-variables-user
+                  value: "{{workflow.parameters.terraform-variables-user}}"
+                - name: terraform-variables-admin
+                  value: "{{workflow.parameters.terraform-variables-admin}}"
 
           - name: approve-destroy
             dependencies: [init-plan-apply]
@@ -129,17 +128,17 @@ spec:
             dependencies: [approve-destroy]
             arguments:
               artifacts:
-              - name: terraform-folder
-                from: "{{tasks.init-plan-apply.outputs.artifacts.terraform-folder}}"
+                - name: terraform-folder
+                  from: "{{tasks.init-plan-apply.outputs.artifacts.terraform-folder}}"
               parameters:
-              - name: terraform-commands
-                value: |
-                  cd /home/terraform/
-                  ls -la
-                  pwd
-                  chmod 644 *.tf
-                  chmod 644 .terraform.lock.hcl
-                  chmod -R 755 .terraform
-                  export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
-                  /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
-                  exit 1
+                - name: terraform-commands
+                  value: |
+                    cd /home/terraform/
+                    ls -la
+                    pwd
+                    chmod 644 *.tf
+                    chmod 644 .terraform.lock.hcl
+                    chmod -R 755 .terraform
+                    export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
+                    /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
+                    exit 1

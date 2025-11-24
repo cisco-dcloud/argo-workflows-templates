@@ -8,19 +8,19 @@ spec:
   # onExit: exit-handler
   arguments:
     parameters:
-    - name: terraform-docker-image
-      value: "hashicorp/terraform:1.4"
-    - name: terraform-script-repository
-      value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
-    - name: terraform-script-path
-      value: "terraform_examples/vsphere"      
+      - name: terraform-docker-image
+        value: "ghcr.io/cisco-dcloud/terraform/terraform-runner:latest"
+      - name: terraform-script-repository
+        value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
+      - name: terraform-script-path
+        value: "terraform_examples/vsphere"
 
   templates:
     - name: outputs
       inputs:
         artifacts:
-        - name: terraform-folder
-          path: /home/current
+          - name: terraform-folder
+            path: /home/current
       script:
         imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
@@ -40,7 +40,7 @@ spec:
               none: {}
         parameters:
           - name: terraform-outputs
-            valueFrom: 
+            valueFrom:
               path: /tmp/tf_outputs.json
 
     - name: approve
@@ -61,33 +61,33 @@ spec:
     - name: terraformscript
       inputs:
         artifacts:
-        - name: terraform-folder
-          path: /home/terraform
+          - name: terraform-folder
+            path: /home/terraform
         parameters:
-        - name: terraform-commands
-          value: ""
+          - name: terraform-commands
+            value: ""
       script:
         imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
-        source: "{{inputs.parameters.terraform-commands}}" 
+        source: "{{inputs.parameters.terraform-commands}}"
         env:
-        - name: TF_VAR_vsphere_username  # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: vsphere-credentials # name of k8s secret
-              key: username     # 'key' subcomponent of the secret
-        - name: TF_VAR_vsphere_password  # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: vsphere-credentials # name of k8s secret
-              key: password     # 'key' subcomponent of the secret
-        - name: TF_VAR_vsphere_server  # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: vsphere-credentials # name of k8s secret
-              key: vsphere_ip     # 'key' subcomponent of the secret
-      # sidecars: 
+          - name: TF_VAR_vsphere_username # name of env var
+            valueFrom:
+              secretKeyRef:
+                name: vsphere-credentials # name of k8s secret
+                key: username # 'key' subcomponent of the secret
+          - name: TF_VAR_vsphere_password # name of env var
+            valueFrom:
+              secretKeyRef:
+                name: vsphere-credentials # name of k8s secret
+                key: password # 'key' subcomponent of the secret
+          - name: TF_VAR_vsphere_server # name of env var
+            valueFrom:
+              secretKeyRef:
+                name: vsphere-credentials # name of k8s secret
+                key: vsphere_ip # 'key' subcomponent of the secret
+      # sidecars:
       #   - name: openvpn
       #     image: mgarciasanes/openconnect
       #     imagePullPolicy: "Always"
@@ -97,18 +97,18 @@ spec:
       #     - name: VPN_PASSWORD
       #       valueFrom:
       #         secretKeyRef:
-      #           name: "{{workflow.parameters.vpn-secret-name}}" 
-      #           key: VPN_PASSWORD 
+      #           name: "{{workflow.parameters.vpn-secret-name}}"
+      #           key: VPN_PASSWORD
       #     - name: VPN_LOGIN
       #       valueFrom:
       #         secretKeyRef:
-      #           name: "{{workflow.parameters.vpn-secret-name}}" 
-      #           key: VPN_LOGIN 
+      #           name: "{{workflow.parameters.vpn-secret-name}}"
+      #           key: VPN_LOGIN
       #     - name: VPN_SERVER
       #       valueFrom:
       #         secretKeyRef:
-      #           name: "{{workflow.parameters.vpn-secret-name}}" 
-      #           key: VPN_SERVER 
+      #           name: "{{workflow.parameters.vpn-secret-name}}"
+      #           key: VPN_SERVER
       outputs:
         artifacts:
           - name: terraform-folder
@@ -123,21 +123,21 @@ spec:
             template: terraformscript
             arguments:
               artifacts:
-              - name: terraform-folder
-                git:
-                  repo: "{{workflow.parameters.terraform-script-repository}}"
-                  depth: 1
+                - name: terraform-folder
+                  git:
+                    repo: "{{workflow.parameters.terraform-script-repository}}"
+                    depth: 1
               parameters:
-              - name: terraform-commands
-                value: |
-                  sleep 10
-                  echo "----"
-                  echo $TF_VAR_vsphere_server
-                  echo $TF_VAR_vsphere_username
-                  echo "----"
-                  mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work && ls -la
-                  /bin/terraform init -input=false
-                  /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan
+                - name: terraform-commands
+                  value: |
+                    sleep 10
+                    echo "----"
+                    echo $TF_VAR_vsphere_server
+                    echo $TF_VAR_vsphere_username
+                    echo "----"
+                    mkdir /home/work && cp -r /home/terraform/{{workflow.parameters.terraform-script-path}}/. /home/work && cd /home/work && ls -la
+                    /bin/terraform init -input=false
+                    /bin/terraform plan -parallelism=2 -input=false -no-color -out=tfclientsplan
           - name: approve-apply
             dependencies: [plan]
             template: approve
@@ -149,26 +149,26 @@ spec:
             #when: '{{tasks.approve-apply.outputs.parameters.approve}} == YES'
             arguments:
               artifacts:
-              - name: terraform-folder
-                from: "{{tasks.plan.outputs.artifacts.terraform-folder}}"
+                - name: terraform-folder
+                  from: "{{tasks.plan.outputs.artifacts.terraform-folder}}"
               parameters:
-              - name: terraform-commands
-                value: |
-                  sleep 10
-                  ls -la /home/terraform
-                  mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
-                  chmod 666 tfclientsplan
-                  chmod 644 *.tf
-                  chmod 644 .terraform.lock.hcl
-                  chmod -R 755 .terraform
-                  /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
+                - name: terraform-commands
+                  value: |
+                    sleep 10
+                    ls -la /home/terraform
+                    mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
+                    chmod 666 tfclientsplan
+                    chmod 644 *.tf
+                    chmod 644 .terraform.lock.hcl
+                    chmod -R 755 .terraform
+                    /bin/terraform apply -input=false -parallelism=2 -no-color tfclientsplan
           - name: outputs
             template: outputs
             dependencies: [apply]
             arguments:
               artifacts:
-              - name: terraform-folder
-                from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
+                - name: terraform-folder
+                  from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
           - name: approve-destroy
             dependencies: [outputs]
             template: approve
@@ -178,18 +178,18 @@ spec:
             #when: '{{tasks.approve-destroy.outputs.parameters.approve}} == YES'
             arguments:
               artifacts:
-              - name: terraform-folder
-                from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
+                - name: terraform-folder
+                  from: "{{tasks.apply.outputs.artifacts.terraform-folder}}"
               parameters:
-              - name: terraform-commands
-                value: |
-                  sleep 10
-                  ls -la /home/terraform
-                  mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
-                  chmod 644 *.tf
-                  chmod 644 .terraform.lock.hcl
-                  chmod -R 755 .terraform
-                  /bin/terraform destroy -auto-approve -input=false -parallelism=2 -no-color
+                - name: terraform-commands
+                  value: |
+                    sleep 10
+                    ls -la /home/terraform
+                    mkdir /home/work && cp -r  /home/terraform/. /home/work && cd /home/work && ls -la
+                    chmod 644 *.tf
+                    chmod 644 .terraform.lock.hcl
+                    chmod -R 755 .terraform
+                    /bin/terraform destroy -auto-approve -input=false -parallelism=2 -no-color
 
     # - name: exit-handler
     #   dag:

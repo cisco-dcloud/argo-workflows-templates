@@ -17,9 +17,9 @@ spec:
   ttlStrategy:
     #The TTLStrategy sets the strategy for how long workflows that are
     # successful, not successful, or completed should live.
-    secondsAfterCompletion: 60  # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
-    secondsAfterSuccess: 60     # Time to live after workflow is successful
-    secondsAfterFailure: 86400   # Time to live after workflow fails
+    secondsAfterCompletion: 60 # Time to live after workflow is completed, replaces ttlSecondsAfterFinished
+    secondsAfterSuccess: 60 # Time to live after workflow is successful
+    secondsAfterFailure: 86400 # Time to live after workflow fails
   entrypoint: main
   serviceAccountName: "argo-workflow"
   # artifactGC:
@@ -28,26 +28,26 @@ spec:
 
   arguments:
     parameters:
-    - name: terraform-docker-image
-      value: "hashicorp/terraform:1.4" 
-    - name: terraform-variables-user
-      value: ""
-    - name: terraform-variables-admin
-      value: ""   
-    - name: terraform-parallelism
-      value: "2"      
-    - name: terraform-debug-level
-      value: "ERROR"                          #TRACE, DEBUG, INFO, WARN or ERROR 
-    - name: terraform-action
-      value: "apply"                          #apply, destroy 
-    - name: terraform-files-s3-bucket
-    - name: terraform-files-s3-key
-    - name: aws-secret-name
-      value: "PM"                             #DCE: static secret  "aws-credentials",  PM: ephimeral secret  {{workflow.name}}
-    - name: pool-manager-reservation-id
-    - name: pool-manager-resource-id
+      - name: terraform-docker-image
+        value: "ghcr.io/cisco-dcloud/terraform/terraform-runner:latest"
+      - name: terraform-variables-user
+        value: ""
+      - name: terraform-variables-admin
+        value: ""
+      - name: terraform-parallelism
+        value: "2"
+      - name: terraform-debug-level
+        value: "ERROR" #TRACE, DEBUG, INFO, WARN or ERROR
+      - name: terraform-action
+        value: "apply" #apply, destroy
+      - name: terraform-files-s3-bucket
+      - name: terraform-files-s3-key
+      - name: aws-secret-name
+        value: "PM" #DCE: static secret  "aws-credentials",  PM: ephimeral secret  {{workflow.name}}
+      - name: pool-manager-reservation-id
+      - name: pool-manager-resource-id
 
-  nodeSelector: 
+  nodeSelector:
     idac.cat-dcloud.com/nodegroup-name: prod
   tolerations:
     - key: "dedicated"
@@ -59,63 +59,63 @@ spec:
     - name: kubect-curl-jq-scripts
       inputs:
         parameters:
-        - name: commands
-          value: ""
+          - name: commands
+            value: ""
       metadata:
         labels:
-          idac_request: "{{workflow.labels.idac_request}}"   #The workflow label is appended by iDAC 
+          idac_request: "{{workflow.labels.idac_request}}" #The workflow label is appended by iDAC
       script:
         imagePullPolicy: "IfNotPresent"
         image: saagie/curl-jq-helm-kubectl:2311020942_1.25.12
         command: ["sh"]
         source: "{{inputs.parameters.commands}}"
         env:
-        - name: POOLMANAGER_TOKEN    
-          valueFrom:
-            secretKeyRef:
-              name: "{{=workflow.namespace == 'idac' ? 'idac' : 'kitchen' }}" 
-              key: POOLMANAGER_TOKEN         
+          - name: POOLMANAGER_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: "{{=workflow.namespace == 'idac' ? 'idac' : 'kitchen' }}"
+                key: POOLMANAGER_TOKEN
       outputs:
         parameters:
           - name: output
-            valueFrom: 
+            valueFrom:
               path: /tmp/outputs.logs
     - name: terraformscript
       inputs:
         artifacts:
-        - name: terraform-folder
-          path: /home/terraform
+          - name: terraform-folder
+            path: /home/terraform
         parameters:
-        - name: terraform-commands
-          value: ""
+          - name: terraform-commands
+            value: ""
       metadata:
         labels:
-          idac_request: "{{workflow.labels.idac_request}}"   #The workflow label is appended by iDAC 
+          idac_request: "{{workflow.labels.idac_request}}" #The workflow label is appended by iDAC
       script:
         imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
-        source: "{{inputs.parameters.terraform-commands}}" 
+        source: "{{inputs.parameters.terraform-commands}}"
         env:
-        - name: AWS_ACCESS_KEY_ID      # name of env var
-          valueFrom:
-            secretKeyRef:
-              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"           
-              key: AWS_ACCESS_KEY_ID
-        - name: AWS_SECRET_ACCESS_KEY  
-          valueFrom:
-            secretKeyRef:
-              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"
-              key: AWS_SECRET_ACCESS_KEY    
-        - name: AWS_DEFAULT_REGION  
-          valueFrom:
-            secretKeyRef:
-              name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"
-              key: AWS_DEFAULT_REGION 
+          - name: AWS_ACCESS_KEY_ID # name of env var
+            valueFrom:
+              secretKeyRef:
+                name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"
+                key: AWS_ACCESS_KEY_ID
+          - name: AWS_SECRET_ACCESS_KEY
+            valueFrom:
+              secretKeyRef:
+                name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"
+                key: AWS_SECRET_ACCESS_KEY
+          - name: AWS_DEFAULT_REGION
+            valueFrom:
+              secretKeyRef:
+                name: "{{=workflow.parameters['aws-secret-name'] == 'PM' ? workflow.name : 'aws-credentials' }}"
+                key: AWS_DEFAULT_REGION
       outputs:
         parameters:
           - name: terraform-outputs
-            valueFrom: 
+            valueFrom:
               path: /tmp/tf_outputs.json
             globalName: terraform-outputs
         artifacts:
@@ -127,80 +127,80 @@ spec:
               key: "{{workflow.parameters.terraform-files-s3-key}}"
     - name: main
       dag:
-        tasks:     
+        tasks:
           - name: "k8s-create-secret"
             template: kubect-curl-jq-scripts
             when: "{{=workflow.parameters['aws-secret-name'] == 'PM'}}"
             arguments:
               parameters:
-              - name: commands
-                value: |
-                  echo "POOLMANAGER_TOKEN: $POOLMANAGER_TOKEN" >> /tmp/outputs.logs
-                  echo "POOLMANAGER_RESERVATION_ID: {{workflow.parameters.pool-manager-reservation-id}}" >> /tmp/outputs.logs
-                  echo "POOLMANAGER_RESOURCE_ID: {{workflow.parameters.pool-manager-resource-id}}" >> /tmp/outputs.logs
-                  result=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource)
-                  echo "POOLMANAGER_RESOURCE: $result" >> /tmp/outputs.logs
+                - name: commands
+                  value: |
+                    echo "POOLMANAGER_TOKEN: $POOLMANAGER_TOKEN" >> /tmp/outputs.logs
+                    echo "POOLMANAGER_RESERVATION_ID: {{workflow.parameters.pool-manager-reservation-id}}" >> /tmp/outputs.logs
+                    echo "POOLMANAGER_RESOURCE_ID: {{workflow.parameters.pool-manager-resource-id}}" >> /tmp/outputs.logs
+                    result=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource)
+                    echo "POOLMANAGER_RESOURCE: $result" >> /tmp/outputs.logs
 
-                  curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource
-                  download=$?
-                  if [ $download -ne 0 ]; then
-                      # Command 2 will only run if command1 failed
-                      echo "Failed to download the secret from poolmanager" >> /tmp/outputs.logs
-                      exit $download
-                  fi
+                    curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource
+                    download=$?
+                    if [ $download -ne 0 ]; then
+                        # Command 2 will only run if command1 failed
+                        echo "Failed to download the secret from poolmanager" >> /tmp/outputs.logs
+                        exit $download
+                    fi
 
-                  kubectl create secret generic {{workflow.name}}  \
-                    --from-literal=AWS_ACCESS_KEY_ID=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource | jq -r  .attributes.accessKeyId) \
-                    --from-literal=AWS_SECRET_ACCESS_KEY=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource | jq -r  .attributes.secretKey) \
-                    --from-literal=AWS_DEFAULT_REGION=$(curl -vvv -H -X GET 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource | jq -r  .attributes.region) \
-                    -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
-                  exit $?
+                    kubectl create secret generic {{workflow.name}}  \
+                      --from-literal=AWS_ACCESS_KEY_ID=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource | jq -r  .attributes.accessKeyId) \
+                      --from-literal=AWS_SECRET_ACCESS_KEY=$(curl -vvv -X GET -H 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource | jq -r  .attributes.secretKey) \
+                      --from-literal=AWS_DEFAULT_REGION=$(curl -vvv -H -X GET 'accept: application/json' -H 'Content-Type: application/json' -H "Authorization: Bearer $POOLMANAGER_TOKEN" -d '{"borrowed_id":"{{workflow.parameters.pool-manager-reservation-id}}", "resource_id":"{{workflow.parameters.pool-manager-resource-id}}"}' http://fridgev2-stable.apps:8080/api/v2/resource | jq -r  .attributes.region) \
+                      -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
+                    exit $?
 
           - name: "terraform"
             template: terraformscript
             depends: "k8s-create-secret.Succeeded"
             arguments:
               artifacts:
-              - name: terraform-folder
-                s3:
-                  endpoint: s3.amazonaws.com
-                  bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
-                  key: "{{workflow.parameters.terraform-files-s3-key}}"
+                - name: terraform-folder
+                  s3:
+                    endpoint: s3.amazonaws.com
+                    bucket: "{{workflow.parameters.terraform-files-s3-bucket}}"
+                    key: "{{workflow.parameters.terraform-files-s3-key}}"
               parameters:
-              - name: terraform-commands
-                value: |
-                  action="{{workflow.parameters.terraform-action}}"
+                - name: terraform-commands
+                  value: |
+                    action="{{workflow.parameters.terraform-action}}"
 
-                  if [ "$action" = "apply" ]; then
-                  echo "Executing apply..."
-                  cat <<-EOF > /home/terraform/terraform_user.tfvars
-                  {{workflow.parameters.terraform-variables-user}}
-                  EOF
-                  cat <<-EOF > /home/terraform/terraform_admin.tfvars
-                  {{workflow.parameters.terraform-variables-admin}}
-                  EOF
-                  cd /home/terraform/
-                  export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
-                  export TF_LOG_PATH="/home/terraform/tf_{{workflow.parameters.terraform-action}}.log"
-                  /bin/terraform init -input=false && /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan && /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
-                  exit 1
-                  fi
+                    if [ "$action" = "apply" ]; then
+                    echo "Executing apply..."
+                    cat <<-EOF > /home/terraform/terraform_user.tfvars
+                    {{workflow.parameters.terraform-variables-user}}
+                    EOF
+                    cat <<-EOF > /home/terraform/terraform_admin.tfvars
+                    {{workflow.parameters.terraform-variables-admin}}
+                    EOF
+                    cd /home/terraform/
+                    export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
+                    export TF_LOG_PATH="/home/terraform/tf_{{workflow.parameters.terraform-action}}.log"
+                    /bin/terraform init -input=false && /bin/terraform plan -parallelism={{workflow.parameters.terraform-parallelism}} -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" -input=false -no-color -out=tfclientsplan && /bin/terraform apply -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color tfclientsplan && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
+                    exit 1
+                    fi
 
-                  if [ "$action" = "destroy" ]; then
-                  echo "Executing destroy..."              
-                  cd /home/terraform/
-                  chmod 644 *.tf
-                  chmod 644 .terraform.lock.hcl
-                  chmod -R 755 .terraform
-                  export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
-                  export TF_LOG_PATH="/home/terraform/tf_{{workflow.parameters.terraform-action}}.log"
-                  /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
-                  exit 1
-                  fi
-              - name: terraform-variables-user
-                value: "{{workflow.parameters.terraform-variables-user}}"
-              - name: terraform-variables-admin
-                value: "{{workflow.parameters.terraform-variables-admin}}"
+                    if [ "$action" = "destroy" ]; then
+                    echo "Executing destroy..."              
+                    cd /home/terraform/
+                    chmod 644 *.tf
+                    chmod 644 .terraform.lock.hcl
+                    chmod -R 755 .terraform
+                    export TF_LOG="{{workflow.parameters.terraform-debug-level}}"
+                    export TF_LOG_PATH="/home/terraform/tf_{{workflow.parameters.terraform-action}}.log"
+                    /bin/terraform destroy -auto-approve -input=false -parallelism={{workflow.parameters.terraform-parallelism}} -no-color -var-file="terraform_user.tfvars" -var-file="terraform_admin.tfvars" && /bin/terraform output -json > /tmp/tf_outputs.json && exit 0
+                    exit 1
+                    fi
+                - name: terraform-variables-user
+                  value: "{{workflow.parameters.terraform-variables-user}}"
+                - name: terraform-variables-admin
+                  value: "{{workflow.parameters.terraform-variables-admin}}"
 
           - name: "k8s-delete-secret"
             template: kubect-curl-jq-scripts
@@ -208,11 +208,10 @@ spec:
             when: "{{=workflow.parameters['aws-secret-name'] == 'PM'}}"
             arguments:
               parameters:
-              - name: commands
-                value: |
-                  kubectl get secret {{workflow.name}} \
-                    -o=json \
-                    -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
-                  kubectl delete secret {{workflow.name}} \
-                    -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
-
+                - name: commands
+                  value: |
+                    kubectl get secret {{workflow.name}} \
+                      -o=json \
+                      -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1
+                    kubectl delete secret {{workflow.name}} \
+                      -n {{workflow.namespace}} >> /tmp/outputs.logs 2>&1

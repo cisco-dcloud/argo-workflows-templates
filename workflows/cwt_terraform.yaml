@@ -6,25 +6,25 @@ spec:
   entrypoint: update
   arguments:
     parameters:
-    - name: terraform-docker-image
-      value: "hashicorp/terraform:1.4"
-    - name: terraform-script-repository
-      value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
-    - name: terraform-script-path
-      value: "terraform_examples/random"      
+      - name: terraform-docker-image
+        value: "ghcr.io/cisco-dcloud/terraform/terraform-runner:latest"
+      - name: terraform-script-repository
+        value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
+      - name: terraform-script-path
+        value: "terraform_examples/random"
 
   templates:
     - name: plan
       inputs:
         artifacts:
-        - name: terraform
-          path: /home/terraform
-          git:
-            repo: "{{workflow.parameters.terraform-script-repository}}"
-            depth: 1
+          - name: terraform
+            path: /home/terraform
+            git:
+              repo: "{{workflow.parameters.terraform-script-repository}}"
+              depth: 1
         parameters:
-        - name: terraform-script-path
-          value: "{{workflow.parameters.terraform-script-path}}" 
+          - name: terraform-script-path
+            value: "{{workflow.parameters.terraform-script-path}}"
       script:
         imagePullPolicy: "Always"
         image: "{{workflow.parameters.terraform-docker-image}}"
@@ -47,8 +47,8 @@ spec:
     - name: apply
       inputs:
         artifacts:
-        - name: terraform-plan
-          path: /home/terraform
+          - name: terraform-plan
+            path: /home/terraform
       script:
         imagePullPolicy: "Always"
         image: "{{workflow.parameters.terraform-docker-image}}"
@@ -72,5 +72,5 @@ spec:
             dependencies: [plan, approve]
             arguments:
               artifacts:
-              - name: terraform-plan
-                from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
+                - name: terraform-plan
+                  from: "{{tasks.plan.outputs.artifacts.terraform-plan}}"
