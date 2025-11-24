@@ -60,5 +60,5 @@ jobs:
           [ "$VERSION" == "merge" ] && VERSION=${{ env.BRANCH_NAME }}
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-          docker tag git-mirror $IMAGE_ID:$VERSION
+          docker tag terraform-runner $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
