@@ -8,7 +8,7 @@ spec:
   arguments:
     parameters:
       - name: terraform-docker-image
-        value: "ghcr.io/cisco-dcloud/terraform/terraform-runner:latest"
+        value: "ghcr.io/cisco-dcloud/argo-workflows-templates/terraform/terraform-runner:latest"
       - name: terraform-script-repository
         value: "https://github.com/cisco-dcloud/argo-workflows-templates.git"
       - name: terraform-script-path

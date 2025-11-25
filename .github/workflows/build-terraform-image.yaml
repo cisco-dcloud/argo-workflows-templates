@@ -48,7 +48,7 @@ jobs:
 
       - name: Push image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/terraform/terraform-runner
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/argo-workflows-templates/terraform/terraform-runner
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
           # Strip git ref prefix from version
