@@ -92,7 +92,7 @@ spec:
         labels:
           idac_request: "{{workflow.labels.idac_request}}" #The workflow label is appended by iDAC
       script:
-        imagePullPolicy: "IfNotPresent"
+        imagePullPolicy: "Always"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: "{{inputs.parameters.terraform-commands}}"
