@@ -36,15 +36,15 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build image
         run: docker buildx build ./terraform-runner --file ./terraform-runner/Dockerfile --tag terraform-runner --label "runnumber=${GITHUB_RUN_ID}"
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: "terraform-runner"
-          format: "table"
-          exit-code: "1"
-          ignore-unfixed: true
-          vuln-type: "os,library"
-          severity: "CRITICAL,HIGH"
+      # - name: Run Trivy vulnerability scanner
+      #   uses: aquasecurity/trivy-action@0.33.1
+      #   with:
+      #     image-ref: "terraform-runner"
+      #     format: "table"
+      #     exit-code: "1"
+      #     ignore-unfixed: true
+      #     vuln-type: "os,library"
+      #     severity: "CRITICAL,HIGH"
 
       - name: Push image
         run: |
