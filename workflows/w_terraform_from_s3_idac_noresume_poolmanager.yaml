@@ -55,6 +55,8 @@ spec:
       value: "prod"
       effect: "NoSchedule"
 
+  imagePullSecrets:
+    - name: devhub-docker.cisco.com
   templates:
     - name: kubect-curl-jq-scripts
       inputs:
@@ -96,8 +98,6 @@ spec:
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: "{{inputs.parameters.terraform-commands}}"
-        imagePullSecrets:
-          - name: devhub-docker.cisco.com
         env:
           - name: AWS_ACCESS_KEY_ID # name of env var
             valueFrom:
