@@ -66,17 +66,17 @@ spec:
         - name: AWS_ACCESS_KEY_ID      # name of env var
           valueFrom:
             secretKeyRef:
-              name: aws-credentials           # name of k8s secret
+              name: aws-creds-kitchen           # name of k8s secret
               key: AWS_ACCESS_KEY_ID          # 'key' subcomponent of the secret
         - name: AWS_SECRET_ACCESS_KEY  
           valueFrom:
             secretKeyRef:
-              name: aws-credentials
+              name: aws-creds-kitchen
               key: AWS_SECRET_ACCESS_KEY    
         - name: AWS_DEFAULT_REGION  
           valueFrom:
             secretKeyRef:
-              name: aws-credentials
+              name: aws-creds-kitchen
               key: AWS_DEFAULT_REGION 
       outputs:
         parameters:
