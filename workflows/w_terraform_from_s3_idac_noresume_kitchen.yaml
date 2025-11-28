@@ -25,7 +25,7 @@ spec:
   arguments:
     parameters:
     - name: terraform-docker-image
-      value: "hashicorp/terraform:1.4" 
+      value: "hashicorp/terraform:1.6" 
     - name: terraform-variables-user
       value: ""
     - name: terraform-variables-admin
