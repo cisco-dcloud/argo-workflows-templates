@@ -94,7 +94,7 @@ spec:
     - name: main
       dag:
         tasks:        
-          - name: "tf-{{workflow.parameters.terraform-action}}"
+          - name: "terraform"
             template: terraformscript
             arguments:
               artifacts:
