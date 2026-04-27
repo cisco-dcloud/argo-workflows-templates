@@ -1,0 +1,46 @@
+name: Curl JQ Helm Kubectl image (Generate Docker images)
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+    paths: &integration_paths
+      - "curl-jq-helm-kubectl/**"
+      - ".github/workflows/build-curl-jq-helm-kubectl-image.yaml"
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+    paths: *integration_paths
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+jobs:
+  push-git-mirror:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build image
+        run: docker buildx build ./curl-jq-helm-kubectl --file ./curl-jq-helm-kubectl/Dockerfile --tag curl-jq-helm-kubectl --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Push image
+        run: |
+          IMAGE_ID=ghcr.io/${{ github.repository_owner }}/argo-workflows-templates/terraform/curl-jq-helm-kubectl
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+          [ "$VERSION" == "main" ] && VERSION=latest
+          [ "$VERSION" == "merge" ] && VERSION=${{ env.BRANCH_NAME }}
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+          docker tag curl-jq-helm-kubectl $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
