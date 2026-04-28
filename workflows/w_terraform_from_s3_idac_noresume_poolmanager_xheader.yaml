@@ -31,7 +31,7 @@ spec:
       - name: terraform-docker-image
         value: "ghcr.io/cisco-dcloud/argo-workflows-templates/terraform/terraform-runner:latest"
       - name: kubectl-curl-jq-docker-image
-        value: "saagie/curl-jq-helm-kubectl:2311020942_1.25.12"
+        value: "ghcr.io/cisco-dcloud/argo-workflows-templates/terraform/curl-jq-helm-kubectl:latest"
       - name: terraform-variables-user
         value: ""
       - name: terraform-variables-admin
@@ -96,7 +96,7 @@ spec:
         labels:
           idac_request: "{{workflow.labels.idac_request}}" #The workflow label is appended by iDAC
       script:
-        imagePullPolicy: "Always"
+        imagePullPolicy: "IfNotPresent"
         image: "{{workflow.parameters.terraform-docker-image}}"
         command: ["sh"]
         source: "{{inputs.parameters.terraform-commands}}"
